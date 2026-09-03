@@ -5,7 +5,7 @@
     "api/index.js": {
       "memory": 1024,
       "maxDuration": 60,
-      "includeFiles": "node_modules/lighthouse/**"
+      "includeFiles": "node_modules/{lighthouse,axe-core,third-party-web,csp_evaluator,robots-parser,lighthouse-stack-packs,intl-messageformat,typed-query-selector,@paulirish,@sentry,@formatjs}/**"
     }
   },
   "rewrites": [
