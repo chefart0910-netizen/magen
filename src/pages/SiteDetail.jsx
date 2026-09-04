@@ -240,6 +240,12 @@ export default function SiteDetail() {
     setNotice("");
     try {
       const result = await fn();
+      // פיצ'ר שעדיין אין לו תשתית מחזיר available:false - זו לא שגיאה, ואסור שיוצג כאדום.
+      if (result?.available === false) {
+        setNotice(result.message);
+        setRunning(null);
+        return;
+      }
       setNotice("הבדיקה הסתיימה בהצלחה.");
       await load();
       if (result?.scan_id) {
@@ -320,7 +326,7 @@ export default function SiteDetail() {
             disabled={running !== null}
             onClick={() => runAction("load", () => api.runLoadTest(siteId, {}))}
           >
-            {running === "load" && <span className="spinner" />} בדיקת עומס מלאה
+            {running === "load" && <span className="spinner" />} בדיקת עומס מלאה (בקרוב)
           </button>
           {user?.is_admin && (
             <button
@@ -328,7 +334,7 @@ export default function SiteDetail() {
               disabled={running !== null}
               onClick={() => runAction("pentest", () => api.runPentest(siteId))}
             >
-              {running === "pentest" && <span className="spinner" />} פנטסט אקטיבי (אדמין בלבד)
+              {running === "pentest" && <span className="spinner" />} פנטסט אקטיבי (בקרוב)
             </button>
           )}
           {!site.ownership_verified && (
