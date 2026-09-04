@@ -18,7 +18,7 @@ export function formatDate(isoOrSqlite) {
 
 export const SCAN_TYPE_LABELS = {
   lighthouse_axe: "בדיקה בסיסית (ביצועים + נגישות)",
-  security_baseline: "בדיקת אבטחה (ZAP)",
+  security_baseline: "בדיקת אבטחה",
   full_load: "בדיקת עומס מלאה",
   active_pentest: "פנטסט אקטיבי",
 };

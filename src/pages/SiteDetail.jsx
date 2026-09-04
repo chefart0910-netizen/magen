@@ -61,9 +61,108 @@ function ViolationsList({ accessibility }) {
   );
 }
 
+function SecurityFindings({ findings }) {
+  if (!findings || findings.length === 0) {
+    return <div className="success-banner">לא נמצאו ממצאי אבטחה בסריקה הפסיבית.</div>;
+  }
+  return (
+    <div>
+      <h3 style={{ fontSize: 16 }}>ממצאי אבטחה ({findings.length})</h3>
+      {findings.map((f, i) => (
+        <div className="violation" key={i}>
+          <div className="v-head">
+            <span className="v-id">{f.id}</span>
+            <span className={`impact-badge impact-${f.severity}`}>
+              {IMPACT_LABELS[f.severity] || f.severity}
+            </span>
+          </div>
+          <div>{f.title}</div>
+          <div className="text-dim" style={{ fontSize: 12, marginTop: 4 }}>{f.description}</div>
+          {f.evidence && (
+            <div className="text-dim" style={{ fontSize: 12, marginTop: 4, wordBreak: "break-all" }}>
+              {f.evidence}
+            </div>
+          )}
+          {f.guided_fix && (
+            <div className="guided-fix">
+              <div className="gf-title">💡 איך מתקנים</div>
+              <div>{f.guided_fix.fix}</div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SecurityResultCard({ result }) {
+  const cert = result.certificate;
+  const badCookies = (result.cookies || []).filter((c) => c.issues.length > 0).length;
+
+  return (
+    <div className="card" style={{ marginTop: 16 }}>
+      <div className="info-banner">
+        סריקה פסיבית: נבדקות כותרות אבטחה, cookies, תעודת TLS, אכיפת HTTPS וקבצים חשופים.
+        אין כאן ניסיון חדירה בפועל - לכך נועד הפנטסט האקטיבי.
+      </div>
+
+      <div className="score-row">
+        <ScoreBox label={`ציון אבטחה (${result.grade})`} value={result.score} />
+        <ScoreBox label="ממצאים" value={result.findings_count} />
+      </div>
+
+      <table className="table" style={{ marginTop: 12 }}>
+        <tbody>
+          <tr>
+            <td>תעודת TLS</td>
+            <td className="text-dim">
+              {cert
+                ? `${cert.issuer || "לא ידוע"} · פגה בעוד ${cert.days_remaining} ימים · ${cert.protocol || ""}`
+                : "לא נקראה"}
+            </td>
+          </tr>
+          <tr>
+            <td>הפניית HTTP ל-HTTPS</td>
+            <td className="text-dim">
+              {result.https?.not_applicable
+                ? "לא רלוונטי (פורט לא סטנדרטי)"
+                : result.https?.enforced
+                ? "נאכפת"
+                : "לא נאכפת"}
+            </td>
+          </tr>
+          <tr>
+            <td>Cookies</td>
+            <td className="text-dim">
+              {(result.cookies || []).length} סה"כ
+              {badCookies > 0 ? ` · ${badCookies} חסרי דגלי אבטחה` : ""}
+            </td>
+          </tr>
+          <tr>
+            <td>קבצים חשופים</td>
+            <td className="text-dim">
+              {(result.exposed_paths || []).length === 0
+                ? "לא נמצאו"
+                : result.exposed_paths.map((p) => p.path).join(", ")}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      {result.zap_error && (
+        <div className="error-banner">סריקת ZAP הנוספת נכשלה: {result.zap_error}</div>
+      )}
+
+      <SecurityFindings findings={result.findings} />
+    </div>
+  );
+}
+
 function ScanResultCard({ scan }) {
   const result = scan.result;
   if (!result) return null;
+  // תוצאת סריקת אבטחה נראית אחרת לגמרי מתוצאת Lighthouse/axe
+  if (result.scan_kind === "passive") return <SecurityResultCard result={result} />;
 
   return (
     <div className="card" style={{ marginTop: 16 }}>
@@ -214,7 +313,7 @@ export default function SiteDetail() {
             disabled={running !== null}
             onClick={() => runAction("security", () => api.runSecurityScan(siteId))}
           >
-            {running === "security" && <span className="spinner" />} בדיקת אבטחה (ZAP)
+            {running === "security" && <span className="spinner" />} בדיקת אבטחה
           </button>
           <button
             className="btn btn-secondary"
@@ -254,6 +353,7 @@ export default function SiteDetail() {
                 <th>סטטוס</th>
                 <th>ביצועים</th>
                 <th>נגישות</th>
+                <th>אבטחה</th>
                 <th>SEO</th>
                 <th>תאריך</th>
                 <th></th>
@@ -268,6 +368,7 @@ export default function SiteDetail() {
                   </td>
                   <td className={scoreClass(s.score_performance)}>{s.score_performance ?? "-"}</td>
                   <td className={scoreClass(s.score_accessibility)}>{s.score_accessibility ?? "-"}</td>
+                  <td className={scoreClass(s.score_security)}>{s.score_security ?? "-"}</td>
                   <td className={scoreClass(s.score_seo)}>{s.score_seo ?? "-"}</td>
                   <td className="text-dim">{formatDate(s.created_at)}</td>
                   <td>
