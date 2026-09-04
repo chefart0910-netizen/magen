@@ -5,17 +5,12 @@
     "api/index.js": {
       "memory": 1024,
       "maxDuration": 60,
-      "includeFiles": "node_modules/{@formatjs/ecma402-abstract,@formatjs/fast-memoize,@formatjs/icu-messageformat-parser,@formatjs/icu-skeleton-parser,@formatjs/intl-localematcher,@paulirish/trace_engine,@puppeteer/browsers,@types/node,agent-base,ansi-colors,ansi-regex,ansi-styles,atomically,axe-core,buffer-crc32,chrome-launcher,chromium-bidi,cliui,color-convert,color-name,configstore,csp_evaluator,debug,decimal.js,define-lazy-prop,devtools-protocol,dot-prop,emoji-regex,end-of-stream,enquirer,escalade,escape-string-regexp,events-universal,extract-zip,fast-fifo,fd-slicer,get-caller-file,get-stream,graceful-fs,http-link-header,image-ssim,intl-messageformat,is-docker,is-fullwidth-code-point,is-wsl,jpeg-js,js-library-detector,legacy-javascript,lighthouse,lighthouse-logger,lighthouse-stack-packs,lodash-es,lookup-closest-locale,marky,metaviewport-parser,mitt,modern-tar,ms,once,open,parse-cache-control,pend,progress,proxy-agent,proxy-from-env,pump,puppeteer-core,require-directory,robots-parser,speedline-core,streamx,string-width,strip-ansi,stubborn-fs,stubborn-utils,tar-fs,tar-stream,text-decoder,third-party-web,through,tldts-core,tldts-icann,tslib,type-fest,typed-query-selector,unbzip2-stream,undici-types,when-exit,wrap-ansi,wrappy,ws,xdg-basedir,y18n,yargs,yargs-parser,yauzl,zod}/**"
+      "includeFiles": "node_modules/**",
+      "excludeFiles": "node_modules/{@opentelemetry,@sentry,@prisma,@types}/**"
     }
   },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
