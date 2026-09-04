@@ -233,6 +233,34 @@ export default function SiteDetail() {
     }
   };
 
+  // סריקה שרצה על runner של GitHub Actions חוזרת מיד עם status "running", והתוצאה
+  // מגיעה לשרת דקה-שתיים אחר כך דרך ה-callback. עד אז מרעננים את ההיסטוריה כל כמה
+  // שניות ומחכים שהרשומה תצא ממצב "רץ".
+  const waitForScan = async (scanId) => {
+    const deadline = Date.now() + 8 * 60 * 1000;
+    while (Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, 5000));
+      let data;
+      try {
+        data = await api.listScans(siteId);
+      } catch (err) {
+        continue; // תקלת רשת רגעית לא צריכה להפיל את ההמתנה
+      }
+      setScans(data.scans);
+      const scan = data.scans.find((s) => s.id === scanId);
+      if (!scan || scan.status === "running" || scan.status === "queued") continue;
+
+      if (scan.status === "completed") {
+        setNotice("הבדיקה הסתיימה בהצלחה.");
+        await openScan(scanId);
+      } else {
+        setError("הבדיקה נכשלה. פתחו אותה בהיסטוריה כדי לראות את הסיבה.");
+      }
+      return;
+    }
+    setError("הבדיקה עדיין רצה. רעננו את העמוד בעוד כמה דקות כדי לראות את התוצאה.");
+  };
+
   const runAction = async (key, fn) => {
     setRunning(key);
     setError("");
@@ -243,6 +271,12 @@ export default function SiteDetail() {
       if (result?.available === false) {
         setNotice(result.message);
         setRunning(null);
+        return;
+      }
+      if (result?.async && result?.scan_id) {
+        setNotice("הבדיקה רצה כעת ברקע. התוצאה תופיע כאן אוטומטית כשתהיה מוכנה.");
+        await load();
+        await waitForScan(result.scan_id);
         return;
       }
       setNotice("הבדיקה הסתיימה בהצלחה.");
