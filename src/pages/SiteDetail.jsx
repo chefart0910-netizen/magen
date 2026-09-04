@@ -181,7 +181,6 @@ function ScanResultCard({ scan }) {
       {result.lighthouse && (
         <div className="score-row">
           <ScoreBox label="ביצועים" value={result.lighthouse.performance} />
-          <ScoreBox label="נגישות (Lighthouse)" value={result.lighthouse.accessibility_lighthouse} />
           <ScoreBox label="Best Practices" value={result.lighthouse.best_practices} />
           <ScoreBox label="SEO" value={result.lighthouse.seo} />
         </div>
