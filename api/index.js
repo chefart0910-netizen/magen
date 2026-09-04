@@ -21,7 +21,21 @@ const adminRoutes = require("../lib/routes/admin");
 
 const app = express();
 
-app.use(cors());
+// ה-frontend מוגש מאותו origin וקורא ל-/api בנתיב יחסי, ולכן הוא לא זקוק ל-CORS בכלל.
+// cors() ללא ארגומנטים היה מחזיר Access-Control-Allow-Origin: * לכל בקשה - כלומר כל אתר זר
+// יכול היה לקרוא תשובות מה-API. ברירת המחדל כאן היא לא לפרסם CORS כלל; אם בעתיד יידרש
+// לקוח ממקור אחר (אפליקציה, תוסף), מגדירים CORS_ALLOWED_ORIGINS כרשימה מופרדת בפסיקים.
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins.length > 0 ? allowedOrigins : false,
+    credentials: allowedOrigins.length > 0,
+  })
+);
 app.use(express.json({ limit: "1mb" }));
 
 app.use((req, _res, next) => {
