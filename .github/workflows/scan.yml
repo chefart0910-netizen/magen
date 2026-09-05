@@ -19,23 +19,28 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+
+      # מטמון על ~/.npm במקום cache: npm של setup-node - זה לא דורש package-lock.json
+      # ובכל זאת חוסך את רוב זמן ההורדה. המפתח הוא ה-hash של package.json, כך שהמטמון
+      # מתאפס אוטומטית כשמשנים תלויות.
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
 
       - name: Install dependencies
-        # npm ci דורש lock file וקורס בלעדיו. עובדים עם מה שיש בריפו בפועל.
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci --omit=dev
-          else
-            npm install --omit=dev --no-audit --no-fund
-          fi
+        # npm install ולא npm ci: ל-npm ci נדרש lock file שנוצר בדיוק בסביבה הזו, וכל
+        # פער בפתרון הגרסאות מפיל אותו. עדיף התקנה שתמיד עובדת על פני נעילה שנשברת.
+        run: npm install --omit=dev --no-audit --no-fund
 
       - name: Run scan
         env:
@@ -45,7 +50,6 @@ jobs:
           SCAN_ID: ${{ inputs.scan_id }}
           SCAN_RUNNER: local
           CHROME_PATH: /usr/bin/google-chrome
-          # אין תקרת 60 שניות כאן, אבל תקציב שפוי מונע ריצה תקועה.
           LIGHTHOUSE_BUDGET_MS: "300000"
           AXE_BUDGET_MS: "120000"
           SCAN_TOTAL_BUDGET_MS: "480000"
@@ -53,10 +57,10 @@ jobs:
           CALLBACK_SECRET: ${{ secrets.MAGEN_CALLBACK_SECRET }}
         run: node scripts/run-scan.js
 
-      # רשת ביטחון: אם משהו נפל לפני run-scan.js (התקנה, checkout), אף אחד לא היה מדווח
-      # ל-MAGEN והסריקה הייתה נשארת "רצה" לנצח. השלב הזה סוגר אותה במפורש.
+      # always() ולא failure(): ביטול (למשל timeout של ה-job) אינו נחשב failure, ובלי זה
+      # סריקה שנחתכה בזמן הייתה נשארת "רצה". השלב עצמו לא ידווח אם הסריקה הצליחה כבר.
       - name: Report failure
-        if: failure()
+        if: always() && job.status != 'success'
         env:
           SCAN_ID: ${{ inputs.scan_id }}
           CALLBACK_URL: ${{ secrets.MAGEN_CALLBACK_URL }}
@@ -65,4 +69,4 @@ jobs:
           curl -sS -X POST "$CALLBACK_URL" \
             -H "Content-Type: application/json" \
             -H "x-magen-scan-secret: $CALLBACK_SECRET" \
-            -d "{\"scan_id\":\"$SCAN_ID\",\"error\":\"the GitHub Actions run failed before the scan completed\"}" || true
+            -d "{\"scan_id\":\"$SCAN_ID\",\"error\":\"the GitHub Actions run did not complete the scan\"}" || true
