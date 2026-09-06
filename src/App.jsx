@@ -7,6 +7,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import SiteDetail from "./pages/SiteDetail";
 import Admin from "./pages/Admin";
+import AccessibilityStatement from "./pages/AccessibilityStatement";
 
 export default function App() {
   const { user } = useAuth();
@@ -46,6 +47,10 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+      {/* הצהרת הנגישות חייבת להיות נגישה לכל אחד, גם למי שאינו מחובר - זו דרישה
+          פורמלית וגם דבר שלקוח פוטנציאלי בודק לפני שהוא נרשם. */}
+      <Route path="/accessibility" element={<AccessibilityStatement />} />
 
       <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />

@@ -1,5 +1,6 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
+import AccessibilityWidget from "./AccessibilityWidget";
 
 const PLAN_LABELS = { free: "חינמי", basic: "בסיסי", pro: "פרו", enterprise: "אנטרפרייז" };
 
@@ -13,8 +14,15 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="app-shell">
-      <nav className="navbar">
+    <>
+      {/* חייב להיות הרכיב הממוקד הראשון בעמוד - אחרת משתמש מקלדת עובר את כל הניווט מחדש
+          בכל מעבר עמוד. מוסתר ויזואלית עד שהוא מקבל מיקוד. */}
+      <a className="skip-link" href="#main-content">
+        דילוג לתוכן המרכזי
+      </a>
+
+      <div className="app-shell">
+      <nav className="navbar" aria-label="ניווט ראשי">
         <div className="brand">
           MAGEN <span className="badge">בטא</span>
         </div>
@@ -43,7 +51,17 @@ export default function Layout({ children }) {
         )}
       </nav>
 
-      <div className="page">{children}</div>
-    </div>
+      <main id="main-content" className="page" tabIndex={-1}>
+        {children}
+      </main>
+
+      <footer className="site-footer">
+        <span>MAGEN</span>
+        <Link to="/accessibility">הצהרת נגישות</Link>
+      </footer>
+      </div>
+
+      <AccessibilityWidget />
+    </>
   );
 }
