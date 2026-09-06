@@ -76,11 +76,16 @@ export default function AccessibilityWidget() {
 
   const update = (patch) => setPrefs((p) => ({ ...p, ...patch }));
 
+  // חובה לחשב מתוך הערך העדכני ולא מתוך prefs שנתפס ב-closure: שתי לחיצות מהירות על
+  // "א+" קוראות שתיהן את אותו ערך ישן, ואז הלחיצה השנייה לא מוסיפה כלום. משתמש שלוחץ
+  // פעמיים כדי להגדיל טקסט הוא בדיוק המשתמש שהווידג'ט הזה נועד לו.
   const stepZoom = (direction) => {
-    const index = ZOOM_STEPS.indexOf(prefs.zoom);
-    const current = index === -1 ? 1 : index;
-    const next = Math.min(ZOOM_STEPS.length - 1, Math.max(0, current + direction));
-    update({ zoom: ZOOM_STEPS[next] });
+    setPrefs((p) => {
+      const index = ZOOM_STEPS.indexOf(p.zoom);
+      const current = index === -1 ? 1 : index;
+      const next = Math.min(ZOOM_STEPS.length - 1, Math.max(0, current + direction));
+      return { ...p, zoom: ZOOM_STEPS[next] };
+    });
   };
 
   const reset = () => setPrefs({ ...DEFAULTS });
