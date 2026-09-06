@@ -13,8 +13,19 @@ const CALLBACK_URL = process.env.CALLBACK_URL;
 const CALLBACK_SECRET = process.env.CALLBACK_SECRET;
 
 async function report(payload) {
-  if (!CALLBACK_URL || !CALLBACK_SECRET) {
-    console.error("CALLBACK_URL / CALLBACK_SECRET חסרים - התוצאה לא נשלחה");
+  // כשל בהגדרה חייב להיות רועש. בגרסה הקודמת הוא נרשם כשורה אחת בלוג והריצה יצאה בשקט,
+  // ולכן שלושה ימים נראה כאילו "הסריקה תקועה" במקום "לא הוגדרו secrets".
+  const missing = [
+    !CALLBACK_URL && "MAGEN_CALLBACK_URL",
+    !CALLBACK_SECRET && "MAGEN_CALLBACK_SECRET",
+  ].filter(Boolean);
+  if (missing.length > 0) {
+    console.error("=".repeat(70));
+    console.error(`שגיאת הגדרה: חסרים secrets בריפו: ${missing.join(", ")}`);
+    console.error("הוסיפו אותם ב-Settings -> Secrets and variables -> Actions");
+    console.error("בלעדיהם ה-runner מסיים את הסריקה אך אין לו לאן להחזיר את התוצאה,");
+    console.error("והבדיקה נשארת במצב 'רץ' עד שהניקוי האוטומטי סוגר אותה.");
+    console.error("=".repeat(70));
     return false;
   }
   const res = await fetch(CALLBACK_URL, {

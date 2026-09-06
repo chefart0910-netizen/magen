@@ -42,6 +42,31 @@ jobs:
         # פער בפתרון הגרסאות מפיל אותו. עדיף התקנה שתמיד עובדת על פני נעילה שנשברת.
         run: npm install --omit=dev --no-audit --no-fund
 
+      # נכשל מוקדם ובקול אם ה-secrets לא הוגדרו, במקום לגלות את זה רק כשהתוצאה לא חוזרת.
+      - name: Verify callback configuration
+        env:
+          CALLBACK_URL: ${{ secrets.MAGEN_CALLBACK_URL }}
+          CALLBACK_SECRET: ${{ secrets.MAGEN_CALLBACK_SECRET }}
+        run: |
+          missing=""
+          [ -z "$CALLBACK_URL" ] && missing="$missing MAGEN_CALLBACK_URL"
+          [ -z "$CALLBACK_SECRET" ] && missing="$missing MAGEN_CALLBACK_SECRET"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing - add them under Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "$CALLBACK_URL" \
+            -H "Content-Type: application/json" \
+            -H "x-magen-scan-secret: $CALLBACK_SECRET" \
+            -d '{"scan_id":"__preflight__"}' || echo "000")
+          # 404 = הסוד נכון והשרת חיפש סריקה בשם __preflight__ ולא מצא. זה מה שאנחנו רוצים.
+          case "$code" in
+            404) echo "callback reachable and the secret matches" ;;
+            401) echo "::error::MAGEN_CALLBACK_SECRET does not match SCAN_CALLBACK_SECRET in Vercel"; exit 1 ;;
+            000) echo "::error::could not reach $CALLBACK_URL - check MAGEN_CALLBACK_URL"; exit 1 ;;
+            *)   echo "::error::unexpected response $code from the callback"; exit 1 ;;
+          esac
+
       - name: Run scan
         env:
           # כתובת האתר מגיעה ממשתמש. היא מועברת כמשתנה סביבה בלבד ולעולם לא מוטמעת
@@ -66,7 +91,11 @@ jobs:
           CALLBACK_URL: ${{ secrets.MAGEN_CALLBACK_URL }}
           CALLBACK_SECRET: ${{ secrets.MAGEN_CALLBACK_SECRET }}
         run: |
-          curl -sS -X POST "$CALLBACK_URL" \
+          # בלי || true: אם גם הדיווח על הכישלון נכשל, זה חייב להופיע בלוג. הבליעה הזו
+          # היא בדיוק מה שהסתיר שה-secrets חסרים.
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -X POST "$CALLBACK_URL" \
             -H "Content-Type: application/json" \
             -H "x-magen-scan-secret: $CALLBACK_SECRET" \
-            -d "{\"scan_id\":\"$SCAN_ID\",\"error\":\"the GitHub Actions run did not complete the scan\"}" || true
+            -d "{\"scan_id\":\"$SCAN_ID\",\"error\":\"the GitHub Actions run did not complete the scan\"}" || echo "000")
+          echo "failure report returned HTTP $code"
+          [ "$code" = "200" ] || echo "::warning::the failure report did not reach MAGEN (HTTP $code)"
