@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 // היא מצג שווא, ובאתר שכל מוצרו הוא בדיקת נגישות זה גם חוסר יושרה מקצועית. כשנשלים ביקורת
 // מלאה - נעדכן את הנוסח ואת התאריך.
 
-const CONTACT_EMAIL = "chefart0910@gmail.com";
+const CONTACT_EMAIL = "pavelchervonchik@gmail.com";
 const LAST_UPDATED = "ספטמבר 2026";
 
 export default function AccessibilityStatement() {
