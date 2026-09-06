@@ -24,19 +24,26 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-shell">
+    <main className="auth-shell">
       <div className="auth-card card">
         <h1>התחברות</h1>
         <div className="sub">שמחים לראות אותך שוב.</div>
 
-        {error && <div className="error-banner">{error}</div>}
+        {/* role=alert: בלעדיו קורא מסך לא מודיע למשתמש שההתחברות נכשלה. */}
+        {error && (
+          <div className="error-banner" role="alert">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={submit}>
           <div className="form-field">
-            <label className="label">אימייל</label>
+            <label className="label" htmlFor="login-email">אימייל</label>
             <input
               className="input"
+              id="login-email"
               type="email"
+              autoComplete="email"
               required
               autoFocus
               value={form.email}
@@ -44,10 +51,12 @@ export default function Login() {
             />
           </div>
           <div className="form-field">
-            <label className="label">סיסמה</label>
+            <label className="label" htmlFor="login-password">סיסמה</label>
             <input
               className="input"
+              id="login-password"
               type="password"
+              autoComplete="current-password"
               required
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -62,6 +71,6 @@ export default function Login() {
           עדיין אין לך חשבון? <Link to="/signup">הרשם עכשיו</Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

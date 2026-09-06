@@ -24,25 +24,30 @@ export default function Signup() {
   };
 
   return (
-    <div className="auth-shell">
+    <main className="auth-shell">
       <div className="auth-card card">
         <h1>יצירת חשבון</h1>
         <div className="sub">התחל לסרוק אתרים תוך פחות מדקה — אתר אחד בחינם, ללא כרטיס אשראי.</div>
 
-        {error && <div className="error-banner">{error}</div>}
+        {/* role=alert: בלעדיו קורא מסך לא מודיע למשתמש שההתחברות נכשלה. */}
+        {error && (
+          <div className="error-banner" role="alert">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={submit}>
           <div className="form-field">
-            <label className="label">שם מלא</label>
-            <input className="input" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+            <label className="label" htmlFor="signup-name">שם מלא</label>
+            <input className="input" id="signup-name" autoComplete="name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
           </div>
           <div className="form-field">
-            <label className="label">אימייל</label>
-            <input className="input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            <label className="label" htmlFor="signup-email">אימייל</label>
+            <input className="input" id="signup-email" type="email" autoComplete="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
           <div className="form-field">
-            <label className="label">סיסמה (8 תווים לפחות)</label>
-            <input className="input" type="password" required minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+            <label className="label" htmlFor="signup-password">סיסמה (8 תווים לפחות)</label>
+            <input className="input" id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
           </div>
           <button className="btn btn-primary btn-block" disabled={loading}>
             {loading ? "יוצר חשבון..." : "צור חשבון"}
@@ -53,6 +58,6 @@ export default function Signup() {
           כבר יש לך חשבון? <Link to="/login">התחבר</Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
