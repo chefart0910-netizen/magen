@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { formatDate, IMPACT_LABELS, SCAN_TYPE_LABELS } from "../lib/format";
+import { SCORE_OPINION_LABELS } from "../lib/reviews";
 
 const IMPACT_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3 };
 const SEVERITY_WEIGHT = { critical: 12, serious: 7, moderate: 3, minor: 1 };
@@ -53,6 +54,36 @@ function priorityList(violations = [], securityFindings = []) {
     fix: f.guided_fix?.fix,
   }));
   return [...a11y, ...sec].sort((x, y) => y.weight - x.weight).slice(0, 5);
+}
+
+// חוות דעת אנושית היא הדבר היחיד בדוח שכלי אוטומטי לא יכול לייצר, ולכן היא מופיעה
+// מיד אחרי התמצית - לפני פירוט הממצאים - ולא נדחקת לסוף.
+function ExpertOpinion({ reviews }) {
+  if (!reviews || reviews.length === 0) return null;
+  return (
+    <section className="rep-section">
+      <h2>חוות דעת מקצועית</h2>
+      {reviews.map((r) => (
+        <div className="rep-review" key={r.id}>
+          <div className="rep-review-head">
+            <strong>{r.expert_name || "מומחה"}</strong>
+            {r.expert_title && <span className="rep-meta"> · {r.expert_title}</span>}
+            <span className="rep-meta"> · {formatDate(r.updated_at || r.created_at)}</span>
+          </div>
+          {r.score_opinion && (
+            <div className="rep-review-opinion">{SCORE_OPINION_LABELS[r.score_opinion]}</div>
+          )}
+          <p className="rep-review-body">{r.summary}</p>
+          {r.improvements && (
+            <>
+              <div className="rep-fix-label" style={{ marginTop: 8 }}>מה אפשר להוסיף או לשפר</div>
+              <p className="rep-review-body">{r.improvements}</p>
+            </>
+          )}
+        </div>
+      ))}
+    </section>
+  );
 }
 
 function AccessibilitySection({ accessibility }) {
@@ -218,6 +249,7 @@ function SecuritySection({ result }) {
 export default function ScanReport() {
   const { scanId } = useParams();
   const [scan, setScan] = useState(null);
+  const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -230,6 +262,15 @@ export default function ScanReport() {
       .catch((err) => {
         if (!cancelled) setError(err.message);
       });
+    // חוות הדעת נטענת בנפרד ובשקט: דוח בלי חוות דעת הוא דוח תקין לחלוטין, ואין סיבה
+    // שכשל בשליפה שלה ימנע מהלקוח לקבל את הדוח עצמו.
+    api
+      .getScanReviews(scanId)
+      .then((data) => {
+        if (!cancelled) setReviews(data.reviews || []);
+      })
+      .catch(() => {});
+
     return () => {
       cancelled = true;
     };
@@ -347,6 +388,8 @@ export default function ScanReport() {
           </>
         )}
       </section>
+
+      <ExpertOpinion reviews={reviews} />
 
       {isSecurity ? (
         <SecuritySection result={result} />

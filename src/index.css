@@ -1037,3 +1037,118 @@ body.report-mode {
 .report-cta + .card {
   margin-top: 8px !important;
 }
+
+/* --- חוות דעת מקצועית (מסך) ------------------------------------------------------------ */
+/* טקסט לקוראי מסך בלבד: צ'קבוקס בטבלה שכל משמעותו נמסרת ע"י כותרת העמודה נשמע ל-screen
+   reader כ"תיבת סימון" בלי לומר של מי - התווית הזו אומרת את זה, בלי לשנות את המראה. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.expert-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.review-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+  background: var(--bg-soft);
+}
+.review-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.review-delete {
+  margin-inline-start: auto;
+}
+.review-opinion {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+/* טקסט חופשי שנכתב ע"י אדם: שומרים על שבירות השורה שהוא בחר, אחרת רשימת המלצות
+   שהוקלדה שורה-שורה מתמזגת לפסקה אחת. */
+.review-body,
+.review-improvements p {
+  white-space: pre-wrap;
+  margin: 8px 0 0;
+}
+.review-improvements {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.review-improvements-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--link);
+}
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+.review-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.review-form input,
+.review-form select,
+.review-form textarea {
+  background: var(--bg-soft);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  font: inherit;
+  width: 100%;
+}
+.review-form textarea {
+  resize: vertical;
+}
+
+/* --- חוות דעת מקצועית (בתוך הדוח המודפס) --- */
+.rep-review {
+  border: 1px solid #d6dbe4;
+  /* פס ההדגשה בצד ההתחלה של השורה - בעברית זהו הצד הימני. */
+  border-inline-start: 4px solid #14181f;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.rep-review-head {
+  margin-bottom: 2px;
+}
+.rep-review-opinion {
+  display: inline-block;
+  margin: 6px 0;
+  padding: 2px 8px;
+  border: 1px solid #8b93a5;
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+.rep-review-body {
+  white-space: pre-wrap;
+  margin: 6px 0 0;
+}

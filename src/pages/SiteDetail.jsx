@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
+import ExpertReview from "../components/ExpertReview";
 import {
   formatDate,
   scoreClass,
@@ -401,6 +402,7 @@ export default function SiteDetail() {
       </div>
 
       {selected && <ScanResultCard scan={selected} />}
+      {selected?.id && <ExpertReview scanId={selected.id} scanStatus={selected.status} />}
 
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ marginTop: 0, fontSize: 16 }}>היסטוריית בדיקות</h2>

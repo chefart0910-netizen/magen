@@ -52,9 +52,17 @@ export const api = {
   runLoadTest: (siteId, payload) => request(`/sites/${siteId}/scans/load`, { method: "POST", body: payload }),
   runPentest: (siteId) => request(`/sites/${siteId}/scans/pentest`, { method: "POST" }),
 
+  // חוות דעת מקצועית על סריקה (routes/reviews.js)
+  reviewerStatus: () => request("/reviews/me"),
+  getScanReviews: (scanId) => request(`/reviews/scan/${scanId}`),
+  saveScanReview: (scanId, payload) => request(`/reviews/scan/${scanId}`, { method: "POST", body: payload }),
+  deleteReview: (reviewId) => request(`/reviews/${reviewId}`, { method: "DELETE" }),
+
   adminStats: () => request("/admin/stats"),
   adminUsers: () => request("/admin/users"),
   adminUpdatePlan: (userId, plan) => request(`/admin/users/${userId}/plan`, { method: "PATCH", body: { plan } }),
+  adminSetExpert: (userId, is_expert) =>
+    request(`/admin/users/${userId}/expert`, { method: "PATCH", body: { is_expert } }),
   adminSites: () => request("/admin/sites"),
   adminScans: () => request("/admin/scans"),
   adminAuditLog: () => request("/admin/audit-log"),

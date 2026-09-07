@@ -69,6 +69,21 @@ function UsersTab() {
     load();
   }, []);
 
+  // סימון "מומחה" הוא אישור אנושי לכך שדבריו של המשתמש ייכנסו לדוח שהלקוח מקבל,
+  // ולכן הוא ניתן כאן בלבד ולא בהרשמה.
+  const toggleExpert = async (id, next) => {
+    setBusyId(id);
+    setError("");
+    try {
+      await api.adminSetExpert(id, next);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const changePlan = async (id, plan) => {
     setBusyId(id);
     setError("");
@@ -94,6 +109,7 @@ function UsersTab() {
             <th>שם</th>
             <th>אתרים</th>
             <th>אדמין</th>
+            <th>מומחה</th>
             <th>חבילה</th>
             <th>נרשם</th>
           </tr>
@@ -105,6 +121,17 @@ function UsersTab() {
               <td>{u.full_name || "-"}</td>
               <td>{u.sites_count}</td>
               <td>{u.is_admin ? "כן" : "-"}</td>
+              <td>
+                <label className="expert-toggle">
+                  <input
+                    type="checkbox"
+                    checked={!!u.is_expert}
+                    disabled={busyId === u.id}
+                    onChange={(e) => toggleExpert(u.id, e.target.checked)}
+                  />
+                  <span className="sr-only">סימון {u.email} כמומחה</span>
+                </label>
+              </td>
               <td>
                 <select
                   className="input"

@@ -18,6 +18,7 @@ const authRoutes = require("../lib/routes/auth");
 const sitesRoutes = require("../lib/routes/sites");
 const scansRoutes = require("../lib/routes/scans");
 const adminRoutes = require("../lib/routes/admin");
+const reviewsRoutes = require("../lib/routes/reviews");
 const scanCallbackRoutes = require("../lib/routes/scan-callback");
 
 const app = express();
@@ -50,6 +51,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/sites", sitesRoutes);
 app.use("/api/sites", scansRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reviews", reviewsRoutes);
 // ללא requireAuth בכוונה - הקורא הוא ה-runner של GitHub Actions, שמזדהה בסוד משותף.
 app.use("/api/scan-callback", scanCallbackRoutes);
 
