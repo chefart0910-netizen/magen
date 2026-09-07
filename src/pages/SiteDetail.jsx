@@ -158,14 +158,36 @@ function SecurityResultCard({ result }) {
   );
 }
 
+// דוח הלקוח נפתח בלשונית חדשה כדי שלא לאבד את מצב העמוד (הבדיקה שנבחרה, הודעות מצב),
+// ומשם המשתמש שומר אותו כ-PDF דרך הדפדפן.
+function ReportLink({ scanId }) {
+  if (!scanId) return null;
+  return (
+    <a className="btn btn-secondary btn-sm" href={`/report/${scanId}`} target="_blank" rel="noreferrer">
+      דוח ללקוח (PDF)
+    </a>
+  );
+}
+
 function ScanResultCard({ scan }) {
   const result = scan.result;
   if (!result) return null;
   // תוצאת סריקת אבטחה נראית אחרת לגמרי מתוצאת Lighthouse/axe
-  if (result.scan_kind === "passive") return <SecurityResultCard result={result} />;
+  if (result.scan_kind === "passive")
+    return (
+      <>
+        <div className="report-cta">
+          <ReportLink scanId={scan.id} />
+        </div>
+        <SecurityResultCard result={result} />
+      </>
+    );
 
   return (
     <div className="card" style={{ marginTop: 16 }}>
+      <div className="report-cta">
+        <ReportLink scanId={scan.id} />
+      </div>
       {result.partial && (
         <div className="info-banner">
           זהו דוח חלקי (חבילה חינמית) - הציונים אמיתיים, אך חלק מהפירוט נעול.
@@ -411,9 +433,12 @@ export default function SiteDetail() {
                   <td className={scoreClass(s.score_seo)}>{s.score_seo ?? "-"}</td>
                   <td className="text-dim">{formatDate(s.created_at)}</td>
                   <td>
-                    <button className="btn btn-secondary btn-sm" onClick={() => openScan(s.id)}>
-                      פתח
-                    </button>
+                    <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                      <button className="btn btn-secondary btn-sm" onClick={() => openScan(s.id)}>
+                        פתח
+                      </button>
+                      {s.status === "completed" && <ReportLink scanId={s.id} />}
+                    </div>
                   </td>
                 </tr>
               ))}

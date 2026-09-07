@@ -796,3 +796,244 @@ html[data-a11y-contrast="high"] a {
   flex-wrap: wrap;
   align-items: center;
 }
+
+/* --- דוח לקוח (/report/:scanId) ---------------------------------------------------------
+   העמוד הזה נועד לצאת כ-PDF, ולכן הוא לא משתמש בערכת הצבעים הכהה של האפליקציה: הדפסת
+   רקע כהה מבזבזת דיו/טונר, וברוב הדפדפנים רקעים כלל לא מודפסים כברירת מחדל - מה שהיה
+   מוציא טקסט בהיר על נייר לבן. כאן הכל שחור על לבן מלכתחילה. */
+/* בזמן שהדוח פתוח, גם גוף המסמך לבן - אחרת נשארים פסים כהים משני צדי הדוח. */
+body.report-mode {
+  background: #ffffff;
+}
+
+.report-doc {
+  background: #ffffff;
+  color: #14181f;
+  min-height: 100vh;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 32px 28px 64px;
+  line-height: 1.6;
+}
+.report-doc a {
+  color: #1a4bcc;
+}
+.rep-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.rep-header {
+  border-bottom: 3px solid #14181f;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+.rep-brand {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #4a5468;
+}
+.report-doc h1 {
+  font-size: 28px;
+  margin: 6px 0 10px;
+}
+.report-doc h2 {
+  font-size: 19px;
+  margin: 28px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #d6dbe4;
+}
+.report-doc h3 {
+  font-size: 16px;
+  margin: 20px 0 8px;
+}
+.rep-subject {
+  font-size: 17px;
+  font-weight: 600;
+  word-break: break-all;
+}
+.rep-meta {
+  font-size: 13px;
+  color: #5a6478;
+}
+.rep-break {
+  word-break: break-all;
+}
+.rep-lead {
+  margin: 0 0 12px;
+}
+.rep-desc {
+  font-size: 14px;
+  margin-top: 4px;
+}
+.rep-note {
+  font-size: 13px;
+  color: #5a6478;
+  font-style: italic;
+}
+.rep-ok {
+  background: #e8f7ee;
+  border-right: 4px solid #1d8a4d;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.rep-error {
+  background: #fdeaea;
+  border-right: 4px solid #b32020;
+  padding: 10px 12px;
+}
+
+.rep-scores {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.rep-score {
+  flex: 1 1 120px;
+  border: 1px solid #d6dbe4;
+  border-top: 4px solid #8b93a5;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+.rep-score-num {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.rep-score-label {
+  font-size: 13px;
+  color: #5a6478;
+}
+.rep-score-grade {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+/* הציון נמסר גם כמילה ("תקין" / "טעון טיפול") ולא רק בצבע המסגרת - דוח שמודפס בשחור-לבן,
+   או נקרא ע"י מי שאינו מבחין בין אדום לירוק, חייב להישאר מובן. */
+.rep-good { border-top-color: #1d8a4d; }
+.rep-good .rep-score-grade { color: #16693a; }
+.rep-mid { border-top-color: #b8770a; }
+.rep-mid .rep-score-grade { color: #8f5c08; }
+.rep-bad { border-top-color: #b32020; }
+.rep-bad .rep-score-grade { color: #931a1a; }
+.rep-na { border-top-color: #8b93a5; }
+
+.rep-priorities {
+  padding-inline-start: 20px;
+  margin: 0;
+}
+.rep-priorities li {
+  margin-bottom: 10px;
+}
+
+.rep-finding {
+  border: 1px solid #d6dbe4;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.rep-finding-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.rep-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+}
+.rep-critical { color: #931a1a; }
+.rep-serious { color: #b32020; }
+.rep-moderate { color: #8f5c08; }
+.rep-minor { color: #4a5468; }
+.rep-info { color: #4a5468; }
+
+.rep-fix {
+  background: #f2f5fa;
+  border-right: 3px solid #3f68e8;
+  padding: 8px 10px;
+  margin-top: 8px;
+  font-size: 14px;
+}
+.rep-fix-label {
+  display: block;
+  font-weight: 700;
+  font-size: 12px;
+  color: #2f52c9;
+}
+
+.rep-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 4px;
+  font-size: 14px;
+}
+.rep-table td {
+  border: 1px solid #d6dbe4;
+  padding: 7px 10px;
+}
+.rep-table td[dir="ltr"] {
+  text-align: right;
+}
+.rep-table td:first-child {
+  font-weight: 600;
+  width: 40%;
+}
+
+.rep-footer {
+  margin-top: 36px;
+  padding-top: 14px;
+  border-top: 1px solid #d6dbe4;
+  font-size: 12.5px;
+  color: #4a5468;
+}
+
+@media print {
+  /* הדפדפן מדפיס את גוף המסמך; המעטפת הכהה של האפליקציה לא צריכה להשפיע כאן. */
+  body {
+    background: #ffffff;
+  }
+  .no-print,
+  .a11y-fab,
+  .a11y-panel,
+  .skip-link {
+    display: none !important;
+  }
+  .report-doc {
+    max-width: none;
+    padding: 0;
+  }
+  /* ממצא שנחתך באמצע בין שני עמודים קשה לקריאה ונראה כמו תקלה בדוח ששולחים ללקוח. */
+  .rep-finding,
+  .rep-score,
+  .rep-priorities li,
+  .rep-table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .report-doc h2 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  a[href]::after {
+    content: "";
+  }
+}
+
+/* מיקום כפתור הפקת הדוח מעל כרטיס התוצאה */
+.report-cta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.report-cta + .card {
+  margin-top: 8px !important;
+}

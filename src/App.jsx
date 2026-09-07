@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import SiteDetail from "./pages/SiteDetail";
 import Admin from "./pages/Admin";
 import AccessibilityStatement from "./pages/AccessibilityStatement";
+import ScanReport from "./pages/ScanReport";
 
 export default function App() {
   const { user } = useAuth();
@@ -44,6 +45,17 @@ export default function App() {
             <Layout>
               <Admin />
             </Layout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* דוח הלקוח נפתח ללא ה-Layout של האפליקציה (ניווט, פוטר, ווידג'ט הנגישות) - הוא
+          נועד לצאת כ-PDF, וכל מה שאינו חלק מהדוח עצמו לא אמור להופיע בו. */}
+      <Route
+        path="/report/:scanId"
+        element={
+          <ProtectedRoute>
+            <ScanReport />
           </ProtectedRoute>
         }
       />
