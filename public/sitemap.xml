@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MAGEN - מפת האתר.
+  רק עמודים ציבוריים. כשהדומיין יוחלף (ראו החלטת השם/דומיין) יש לעדכן את הכתובות כאן
+  ובשורת ה-Sitemap שב-robots.txt, אחרת Search Console ידווח על כתובות שאינן בדומיין.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://magen-pi.vercel.app/</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://magen-pi.vercel.app/signup</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://magen-pi.vercel.app/accessibility</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>

@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [form, setForm] = useState({ url: "", label: "" });
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState(null);
+  const [pendingExpert, setPendingExpert] = useState(false);
 
   const load = async () => {
     try {
@@ -24,6 +25,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     load();
+    // סטטוס אישור איש מקצוע נשאל מהשרת ולא נלקח מהמשתמש השמור בדפדפן, כדי שהאישור
+    // ייכנס לתוקף ברענון עמוד ולא רק אחרי התחברות מחדש.
+    api
+      .reviewerStatus()
+      .then((d) => setPendingExpert(!!d.pending_expert))
+      .catch(() => {});
   }, []);
 
   const addSite = async (e) => {
@@ -82,6 +89,13 @@ export default function Dashboard() {
           + הוספת אתר
         </button>
       </div>
+
+      {pendingExpert && (
+        <div className="info-banner">
+          בקשתכם לחשבון איש מקצוע ממתינה לאישור. עד לאישור אפשר להוסיף אתרים ולסרוק אותם כרגיל;
+          כתיבת חוות דעת על סריקות תיפתח לאחר הבדיקה.
+        </div>
+      )}
 
       {error && <div className="error-banner">{error}</div>}
 

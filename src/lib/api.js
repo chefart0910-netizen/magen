@@ -36,12 +36,18 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
 }
 
 export const api = {
+  // סריקת הטעימה בעמוד הבית - ללא טוקן בכוונה (auth: false), זה הנתיב הציבורי היחיד.
+  publicScan: (url) => request("/public/scan", { method: "POST", body: { url }, auth: false }),
+
   register: (payload) => request("/auth/register", { method: "POST", body: payload, auth: false }),
   login: (payload) => request("/auth/login", { method: "POST", body: payload, auth: false }),
 
   listSites: () => request("/sites"),
   addSite: (payload) => request("/sites", { method: "POST", body: payload }),
   deleteSite: (id) => request(`/sites/${id}`, { method: "DELETE" }),
+  // אימות בעלות: getVerification מחזיר את האסימון וההוראות, verifyOwnership מבקש
+  // מהשרת לבדוק בפועל (DNS TXT / קובץ / תג meta) - ראו lib/routes/sites.js.
+  getVerification: (id) => request(`/sites/${id}/verification`),
   verifyOwnership: (id) => request(`/sites/${id}/verify-ownership`, { method: "POST" }),
 
   runScan: (siteId) => request(`/sites/${siteId}/scans`, { method: "POST" }),
@@ -61,6 +67,9 @@ export const api = {
   adminStats: () => request("/admin/stats"),
   adminUsers: () => request("/admin/users"),
   adminUpdatePlan: (userId, plan) => request(`/admin/users/${userId}/plan`, { method: "PATCH", body: { plan } }),
+  adminPendingReviews: () => request("/admin/pending-reviews"),
+  adminReviewAction: (reviewId, action) =>
+    request(`/admin/reviews/${reviewId}`, { method: "PATCH", body: { action } }),
   adminSetExpert: (userId, is_expert) =>
     request(`/admin/users/${userId}/expert`, { method: "PATCH", body: { is_expert } }),
   adminSites: () => request("/admin/sites"),

@@ -9,6 +9,7 @@ import SiteDetail from "./pages/SiteDetail";
 import Admin from "./pages/Admin";
 import AccessibilityStatement from "./pages/AccessibilityStatement";
 import ScanReport from "./pages/ScanReport";
+import Landing from "./pages/Landing";
 
 export default function App() {
   const { user } = useAuth();
@@ -64,7 +65,9 @@ export default function App() {
           פורמלית וגם דבר שלקוח פוטנציאלי בודק לפני שהוא נרשם. */}
       <Route path="/accessibility" element={<AccessibilityStatement />} />
 
-      <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+      {/* עמוד הבית הציבורי. עד עכשיו "/" הפנה ל-/login, כלומר גולש חדש וגוגל ראו מסך
+          התחברות ולא הבינו מה המוצר עושה. משתמש מחובר ממשיך ישר לדשבורד. */}
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
     </Routes>
   );

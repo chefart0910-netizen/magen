@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
 import ExpertReview from "../components/ExpertReview";
+import VerifyOwnership from "../components/VerifyOwnership";
 import {
   formatDate,
   scoreClass,
@@ -316,19 +317,6 @@ export default function SiteDetail() {
     }
   };
 
-  const verify = async () => {
-    setRunning("verify");
-    setError("");
-    try {
-      await api.verifyOwnership(siteId);
-      await load();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setRunning(null);
-    }
-  };
-
   if (!site && !error) return <div className="text-dim">טוען...</div>;
   if (!site) {
     return (
@@ -393,13 +381,14 @@ export default function SiteDetail() {
               {running === "pentest" && <span className="spinner" />} פנטסט אקטיבי (בקרוב)
             </button>
           )}
-          {!site.ownership_verified && (
-            <button className="btn btn-secondary" disabled={running !== null} onClick={verify}>
-              {running === "verify" && <span className="spinner" />} אמת בעלות (נדרש לעומס/פנטסט)
-            </button>
-          )}
         </div>
       </div>
+
+      <VerifyOwnership
+        siteId={siteId}
+        verified={!!site.ownership_verified}
+        onVerified={load}
+      />
 
       {selected && <ScanResultCard scan={selected} />}
       {selected?.id && <ExpertReview scanId={selected.id} scanStatus={selected.status} />}

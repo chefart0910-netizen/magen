@@ -17,6 +17,7 @@ export function ReviewCard({ review, onDelete, canDelete }) {
     <div className="review-card">
       <div className="review-head">
         <strong>{review.expert_name || "מומחה"}</strong>
+        {review.status === "pending" && <span className="pending-pill">ממתין לאישור</span>}
         {review.expert_title && <span className="text-dim"> · {review.expert_title}</span>}
         {canDelete && (
           <button className="btn btn-secondary btn-sm review-delete" onClick={() => onDelete(review.id)}>
@@ -45,6 +46,7 @@ export function ReviewCard({ review, onDelete, canDelete }) {
 export default function ExpertReview({ scanId, scanStatus }) {
   const [reviews, setReviews] = useState([]);
   const [canReview, setCanReview] = useState(false);
+  const [probation, setProbation] = useState(false);
   const [myUserId, setMyUserId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [open, setOpen] = useState(false);
@@ -57,6 +59,7 @@ export default function ExpertReview({ scanId, scanStatus }) {
       const data = await api.getScanReviews(scanId);
       setReviews(data.reviews);
       setCanReview(data.can_review);
+      setProbation(!!data.probation);
       setMyUserId(data.my_user_id);
       // מומחה שכבר כתב - הטופס נטען עם דבריו, כדי שעריכה תהיה עריכה ולא כתיבה מחדש.
       const mine = data.reviews.find((r) => r.expert_user_id === data.my_user_id);
@@ -86,6 +89,7 @@ export default function ExpertReview({ scanId, scanStatus }) {
     try {
       const data = await api.saveScanReview(scanId, form);
       setReviews(data.reviews);
+      setProbation(!!data.probation);
       setOpen(false);
     } catch (err) {
       setError(err.message);
@@ -129,6 +133,13 @@ export default function ExpertReview({ scanId, scanStatus }) {
       )}
 
       {error && <div className="error-banner">{error}</div>}
+
+      {canReview && probation && (
+        <div className="info-banner">
+          חוות הדעת הראשונות שלכם נקראות לפני שהן מגיעות ללקוח. אחרי שלוש חוות דעת מאושרות
+          הפרסום יהיה מיידי.
+        </div>
+      )}
 
       {canReview && scanStatus === "completed" && !open && (
         <button className="btn btn-secondary" style={{ marginTop: 12 }} onClick={() => setOpen(true)}>

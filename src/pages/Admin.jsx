@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { formatDate, scoreClass, STATUS_LABELS } from "../lib/format";
+import { SCORE_OPINION_LABELS } from "../lib/reviews";
 
 const PLANS = ["free", "basic", "pro", "enterprise"];
+const ACCOUNT_TYPE_LABELS = { owner: "בעל אתר", professional: "איש מקצוע" };
 const PLAN_LABELS = { free: "חינמי", basic: "בסיסי", pro: "פרו", enterprise: "אנטרפרייז" };
 
 function StatsTab() {
@@ -108,6 +110,7 @@ function UsersTab() {
             <th>אימייל</th>
             <th>שם</th>
             <th>אתרים</th>
+            <th>סוג חשבון</th>
             <th>אדמין</th>
             <th>מומחה</th>
             <th>חבילה</th>
@@ -120,6 +123,38 @@ function UsersTab() {
               <td>{u.email}</td>
               <td>{u.full_name || "-"}</td>
               <td>{u.sites_count}</td>
+              <td>
+                {ACCOUNT_TYPE_LABELS[u.account_type] || "בעל אתר"}
+                {u.account_type === "professional" && !u.is_expert && (
+                  <span className="pending-pill">ממתין לאישור</span>
+                )}
+                {u.professional_title && (
+                  <div className="text-dim" style={{ fontSize: 12 }}>{u.professional_title}</div>
+                )}
+                {u.professional_site && (
+                  <div style={{ fontSize: 12, marginTop: 2 }}>
+                    <a href={u.professional_site} target="_blank" rel="noreferrer noopener">
+                      {u.professional_site}
+                    </a>
+                    <div className="text-dim">
+                      {u.pro_site_accessibility === null || u.pro_site_accessibility === undefined ? (
+                        "האתר שלו טרם נסרק"
+                      ) : (
+                        <>
+                          האתר שלו: נגישות{" "}
+                          <span className={scoreClass(u.pro_site_accessibility)}>
+                            {u.pro_site_accessibility}
+                          </span>{" "}
+                          · ביצועים{" "}
+                          <span className={scoreClass(u.pro_site_performance)}>
+                            {u.pro_site_performance ?? "-"}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </td>
               <td>{u.is_admin ? "כן" : "-"}</td>
               <td>
                 <label className="expert-toggle">
@@ -277,9 +312,91 @@ function AuditLogTab() {
   );
 }
 
+function ReviewsTab() {
+  const [reviews, setReviews] = useState(null);
+  const [error, setError] = useState("");
+  const [busyId, setBusyId] = useState(null);
+
+  const load = () =>
+    api.adminPendingReviews().then((d) => setReviews(d.reviews)).catch((e) => setError(e.message));
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const act = async (id, action) => {
+    setBusyId(id);
+    setError("");
+    try {
+      await api.adminReviewAction(id, action);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  if (error) return <div className="error-banner">{error}</div>;
+  if (!reviews) return <div className="text-dim">טוען...</div>;
+  if (reviews.length === 0) {
+    return <div className="card text-dim">אין חוות דעת שממתינות לאישור.</div>;
+  }
+
+  return (
+    <div className="card">
+      <div className="info-banner">
+        חוות הדעת כאן נכתבו ע"י מומחים בתקופת ניסיון ואינן נראות ללקוח עד לאישור. אחרי שלוש
+        חוות דעת מאושרות המומחה מפרסם ישירות.
+      </div>
+
+      {reviews.map((r) => (
+        <div className="review-card" key={r.id}>
+          <div className="review-head">
+            <strong>{r.expert_name || r.expert_email}</strong>
+            <span className="text-dim">
+              · {r.expert_email} · אושרו לו עד כה: {r.reviews_approved}
+            </span>
+          </div>
+          <div className="text-dim" style={{ fontSize: 12 }}>
+            {r.site_url} · {formatDate(r.created_at)}
+          </div>
+          {r.score_opinion && (
+            <div className="review-opinion">{SCORE_OPINION_LABELS[r.score_opinion]}</div>
+          )}
+          <p className="review-body">{r.summary}</p>
+          {r.improvements && (
+            <div className="review-improvements">
+              <div className="review-improvements-title">מה אפשר להוסיף או לשפר</div>
+              <p>{r.improvements}</p>
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            <button
+              className="btn btn-primary btn-sm"
+              disabled={busyId === r.id}
+              onClick={() => act(r.id, "approve")}
+            >
+              אישור ופרסום
+            </button>
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={busyId === r.id}
+              onClick={() => act(r.id, "reject")}
+            >
+              דחייה
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const TABS = [
   { key: "stats", label: "סטטיסטיקות", Component: StatsTab },
   { key: "users", label: "משתמשים", Component: UsersTab },
+  { key: "reviews", label: "חוות דעת לאישור", Component: ReviewsTab },
   { key: "sites", label: "אתרים", Component: SitesTab },
   { key: "scans", label: "בדיקות", Component: ScansTab },
   { key: "audit", label: "לוג ביקורת", Component: AuditLogTab },

@@ -20,6 +20,7 @@ const scansRoutes = require("../lib/routes/scans");
 const adminRoutes = require("../lib/routes/admin");
 const reviewsRoutes = require("../lib/routes/reviews");
 const scanCallbackRoutes = require("../lib/routes/scan-callback");
+const publicRoutes = require("../lib/routes/public");
 
 const app = express();
 
@@ -46,6 +47,10 @@ app.use((req, _res, next) => {
 });
 
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
+
+// ללא requireAuth בכוונה - זו סריקת הטעימה של עמוד הבית. ההגנות (הגבלת קצב, חסימת
+// כתובות פנימיות, תוצאה חלקית) נמצאות בתוך lib/routes/public.js.
+app.use("/api/public", publicRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/sites", sitesRoutes);

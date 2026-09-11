@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
+import Seo from "../components/Seo";
 
 export default function Login() {
   const { login } = useAuth();
@@ -25,6 +26,11 @@ export default function Login() {
 
   return (
     <main className="auth-shell">
+      <Seo
+        title="התחברות"
+        description="התחברו לחשבון MAGEN כדי לסרוק את האתר שלכם ולצפות בדוחות ביצועים, נגישות, SEO ואבטחה."
+        path="/login"
+      />
       <div className="auth-card card">
         <h1>התחברות</h1>
         <div className="sub">שמחים לראות אותך שוב.</div>

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import Seo from "../components/Seo";
 
 // MAGEN - הצהרת נגישות.
 // ==========================================================================================
@@ -12,6 +13,11 @@ const LAST_UPDATED = "ספטמבר 2026";
 export default function AccessibilityStatement() {
   return (
     <div className="page">
+      <Seo
+        title="הצהרת נגישות"
+        description="הצהרת הנגישות של MAGEN - מצב הנגישות באתר, האמצעים שיושמו ודרכי פנייה לרכז הנגישות."
+        path="/accessibility"
+      />
       <div className="page-header">
         <div>
           <h1>הצהרת נגישות</h1>

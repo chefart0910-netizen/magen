@@ -1,0 +1,19 @@
+# MAGEN - robots.txt
+# העמודים הציבוריים הם עמוד הבית, ההרשמה והצהרת הנגישות. כל השאר יושב מאחורי התחברות
+# ואין לו מה לעשות בגוגל: הדשבורד, האתרים של הלקוחות, הדוחות והבק-אופיס. החסימה כאן
+# מונעת סריקה, ובנוסף כל עמוד מאחורי ProtectedRoute מחזיר גם meta robots=noindex - כי
+# robots.txt לבד לא מונע הופעה באינדקס אם מישהו מקשר לעמוד מבחוץ.
+
+User-agent: *
+Allow: /$
+Allow: /signup
+Allow: /accessibility
+
+Disallow: /dashboard
+Disallow: /sites
+Disallow: /report
+Disallow: /admin
+Disallow: /login
+Disallow: /api/
+
+Sitemap: https://magen-pi.vercel.app/sitemap.xml
