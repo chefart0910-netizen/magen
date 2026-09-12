@@ -43,7 +43,7 @@
   "rewrites": [
     {
       "source": "/sitemap-scans.xml",
-      "destination": "/api/public/sitemap.xml"
+      "destination": "/api"
     },
     {
       "source": "/api/(.*)",

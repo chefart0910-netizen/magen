@@ -49,6 +49,13 @@ app.use((req, _res, next) => {
 
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 
+// מפת האתר של עמודי התוצאה שפורסמו, בכתובת ציבורית ולא תחת /api.
+// למה כאן ולא רק ב-router: ב-vercel.json יש rewrite מ-/sitemap-scans.xml לפונקציה הזו.
+// Vercel לא משרשרת rewrites, ולכן rewrite שמצביע על /api/public/sitemap.xml נכשל ב-404 -
+// הוא מחפש קובץ פלט בשם הזה. הפתרון: ה-rewrite מצביע על /api, הפונקציה רואה את הנתיב
+// המקורי, ו-Express מטפל בו כאן.
+app.get("/sitemap-scans.xml", publicRoutes.sitemapHandler);
+
 // ללא requireAuth בכוונה - זו סריקת הטעימה של עמוד הבית. ההגנות (הגבלת קצב, חסימת
 // כתובות פנימיות, תוצאה חלקית) נמצאות בתוך lib/routes/public.js.
 app.use("/api/public", publicRoutes);
