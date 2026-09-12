@@ -4,9 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MAGEN - בריאות האתר שלך</title>
-    <!-- שפה וכיוון לפני טעינת ריאקט. קובץ חיצוני ולא inline, כי ה-CSP הוא
-         script-src 'self' - סקריפט inline נחסם בפרודקשן. ראו public/lang-boot.js. -->
-    <script src="/lang-boot.js"></script>
+    <!-- שפה וכיוון לפני טעינת ריאקט, כדי שמבקר ב-/en לא יראה הבהוב של פריסה מימין
+         לשמאל. inline ולא קובץ חיצוני כדי לא להוסיף בקשה חוסמת לפני הציור הראשון;
+         ה-CSP ב-vercel.json מתיר אותו לפי sha256 של התוכן המדויק - לא unsafe-inline.
+         שינוי של תו אחד כאן מחייב עדכון ה-hash, אחרת הדפדפן חוסם את הסקריפט בשקט. -->
+    <script>(function(){var p=location.pathname;if(p==="/en"||p.indexOf("/en/")===0){document.documentElement.lang="en";document.documentElement.dir="ltr";}})();</script>
   </head>
   <body>
     <div id="root"></div>
