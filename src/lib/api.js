@@ -38,6 +38,10 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
 export const api = {
   // סריקת הטעימה בעמוד הבית - ללא טוקן בכוונה (auth: false), זה הנתיב הציבורי היחיד.
   publicScan: (url) => request("/public/scan", { method: "POST", body: { url }, auth: false }),
+  // תוצאה ציבורית שפורסמה (/s/:slug) - ללא טוקן, זה עמוד פתוח.
+  publicScanResult: (slug) => request(`/public/scan/${slug}`, { auth: false }),
+  shareScan: (siteId, scanId, publish) =>
+    request(`/sites/${siteId}/scans/${scanId}/share`, { method: "POST", body: { publish } }),
 
   register: (payload) => request("/auth/register", { method: "POST", body: payload, auth: false }),
   login: (payload) => request("/auth/login", { method: "POST", body: payload, auth: false }),
@@ -63,6 +67,12 @@ export const api = {
   getScanReviews: (scanId) => request(`/reviews/scan/${scanId}`),
   saveScanReview: (scanId, payload) => request(`/reviews/scan/${scanId}`, { method: "POST", body: payload }),
   deleteReview: (reviewId) => request(`/reviews/${reviewId}`, { method: "DELETE" }),
+
+  // הרשאות מומחה לאתר (lib/routes/grants.js). ההענקה והביטול תמיד של בעל האתר.
+  listGrants: (siteId) => request(`/grants/site/${siteId}`),
+  grantExpert: (siteId, email) => request(`/grants/site/${siteId}`, { method: "POST", body: { email } }),
+  revokeGrant: (grantId) => request(`/grants/${grantId}`, { method: "DELETE" }),
+  myGrantedSites: () => request("/grants/mine"),
 
   adminStats: () => request("/admin/stats"),
   adminUsers: () => request("/admin/users"),

@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
+import { useLang } from "../lib/LangContext";
 import Seo from "../components/Seo";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 export default function Signup() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { t, path } = useLang();
+  const L = t.signup;
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -27,7 +31,7 @@ export default function Signup() {
         professional_title: form.professional_title,
         professional_site: form.professional_site,
       });
-      navigate("/dashboard");
+      navigate(path("/dashboard"));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -37,14 +41,13 @@ export default function Signup() {
 
   return (
     <main className="auth-shell">
-      <Seo
-        title="הרשמה"
-        description="פתחו חשבון MAGEN וסרקו אתר אחד בחינם - ביצועים, נגישות לפי תקן ישראלי 5568, SEO ואבטחה. ללא כרטיס אשראי."
-        path="/signup"
-      />
+      <Seo title={L.title} description={L.seoDesc} path="/signup" />
       <div className="auth-card card">
-        <h1>יצירת חשבון</h1>
-        <div className="sub">התחל לסרוק אתרים תוך פחות מדקה — אתר אחד בחינם, ללא כרטיס אשראי.</div>
+        <div className="auth-top">
+          <LanguageSwitcher />
+        </div>
+        <h1>{L.title}</h1>
+        <div className="sub">{L.sub}</div>
 
         {/* role=alert: בלעדיו קורא מסך לא מודיע למשתמש שההתחברות נכשלה. */}
         {error && (
@@ -55,17 +58,17 @@ export default function Signup() {
 
         <form onSubmit={submit}>
           <div className="form-field">
-            <label className="label" htmlFor="signup-name">שם מלא</label>
+            <label className="label" htmlFor="signup-name">{L.fullName}</label>
             <input className="input" id="signup-name" autoComplete="name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
           </div>
           <div className="form-field">
-            <label className="label" htmlFor="signup-email">אימייל</label>
+            <label className="label" htmlFor="signup-email">{L.email}</label>
             <input className="input" id="signup-email" type="email" autoComplete="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
           {/* fieldset + legend ולא div + כותרת: כך קורא מסך מכריז על השאלה כולה לפני
               האפשרויות, ולא מקריא שתי תיבות בודדות בלי הקשר. */}
           <fieldset className="form-field account-type">
-            <legend className="label">איך תשתמשו ב-MAGEN?</legend>
+            <legend className="label">{L.howUse}</legend>
 
             <label className="choice">
               <input
@@ -76,8 +79,8 @@ export default function Signup() {
                 onChange={(e) => setForm({ ...form, account_type: e.target.value })}
               />
               <span>
-                <strong>יש לי אתר</strong>
-                <span className="choice-hint">בדיקה וניטור של האתר שלי</span>
+                <strong>{L.ownerTitle}</strong>
+                <span className="choice-hint">{L.ownerHint}</span>
               </span>
             </label>
 
@@ -90,8 +93,8 @@ export default function Signup() {
                 onChange={(e) => setForm({ ...form, account_type: e.target.value })}
               />
               <span>
-                <strong>אני איש מקצוע</strong>
-                <span className="choice-hint">בונה או מתחזק אתרים עבור לקוחות</span>
+                <strong>{L.proTitle}</strong>
+                <span className="choice-hint">{L.proHint}</span>
               </span>
             </label>
           </fieldset>
@@ -99,51 +102,45 @@ export default function Signup() {
           {form.account_type === "professional" && (
             <>
               <div className="form-field">
-                <label className="label" htmlFor="signup-site">כתובת האתר שלכם</label>
+                <label className="label" htmlFor="signup-site">{L.yourSite}</label>
                 <input
                   className="input"
                   id="signup-site"
                   required
-                  placeholder="example.co.il"
+                  placeholder={t.landing.urlPlaceholder}
                   value={form.professional_site}
                   onChange={(e) => setForm({ ...form, professional_site: e.target.value })}
                 />
-                <div className="field-hint">
-                  האתר יתווסף לחשבון ותוכלו לסרוק אותו. תוצאת הסריקה היא חלק מבדיקת הבקשה.
-                </div>
+                <div className="field-hint">{L.yourSiteHint}</div>
               </div>
               <div className="form-field">
-                <label className="label" htmlFor="signup-title">תחום ההתמחות (לא חובה)</label>
+                <label className="label" htmlFor="signup-title">{L.expertise}</label>
                 <input
                   className="input"
                   id="signup-title"
                   maxLength={120}
-                  placeholder="למשל: בניית אתרי וורדפרס · נגישות דיגיטלית"
+                  placeholder={L.expertisePlaceholder}
                   value={form.professional_title}
                   onChange={(e) => setForm({ ...form, professional_title: e.target.value })}
                 />
               </div>
               {/* אומרים מראש שזו בקשה ולא הרשאה מיידית, כדי שאיש מקצוע לא יחשוב שמשהו
                   שבור כשהוא לא מוצא את אפשרות כתיבת חוות הדעת אחרי ההרשמה. */}
-              <div className="info-banner">
-                חשבון איש מקצוע נבדק ידנית לפני שמתאפשרת כתיבת חוות דעת על סריקות, וגם לאחר
-                האישור חוות הדעת הראשונות נקראות לפני שהן מגיעות ללקוח. עד לאישור החשבון פעיל
-                רגיל, וניתן להוסיף אתרים ולסרוק אותם.
-              </div>
+              <div className="info-banner">{L.proNotice}</div>
             </>
           )}
 
           <div className="form-field">
-            <label className="label" htmlFor="signup-password">סיסמה (8 תווים לפחות)</label>
+            <label className="label" htmlFor="signup-password">{L.password}</label>
             <input className="input" id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
           </div>
           <button className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? "יוצר חשבון..." : "צור חשבון"}
+            {loading ? L.submitting : L.submit}
           </button>
         </form>
 
         <div className="form-footer">
-          כבר יש לך חשבון? <Link to="/login">התחבר</Link>
+          {L.haveAccount} <Link to={path("/login")}>{L.loginLink}</Link>
         </div>
       </div>
     </main>

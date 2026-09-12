@@ -412,7 +412,7 @@ a:hover {
 }
 .table th,
 .table td {
-  text-align: right;
+  text-align: start;
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
 }
@@ -874,13 +874,13 @@ body.report-mode {
 }
 .rep-ok {
   background: #e8f7ee;
-  border-right: 4px solid #1d8a4d;
+  border-inline-end: 4px solid #1d8a4d;
   padding: 10px 12px;
   font-size: 14px;
 }
 .rep-error {
   background: #fdeaea;
-  border-right: 4px solid #b32020;
+  border-inline-end: 4px solid #b32020;
   padding: 10px 12px;
 }
 
@@ -958,7 +958,7 @@ body.report-mode {
 
 .rep-fix {
   background: #f2f5fa;
-  border-right: 3px solid #3f68e8;
+  border-inline-end: 3px solid #3f68e8;
   padding: 8px 10px;
   margin-top: 8px;
   font-size: 14px;
@@ -981,7 +981,7 @@ body.report-mode {
   padding: 7px 10px;
 }
 .rep-table td[dir="ltr"] {
-  text-align: right;
+  text-align: start;
 }
 .rep-table td:first-child {
   font-weight: 600;
@@ -1555,4 +1555,68 @@ body.report-mode {
   margin: 8px 0 0;
   font-size: 12.5px;
   line-height: 1.5;
+}
+
+/* ==========================================================================================
+   עמוד תוצאה ציבורי (pages/PublicScan.jsx)
+   ========================================================================================== */
+
+.ps-head {
+  margin-bottom: 26px;
+}
+
+.ps-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.ps-tile {
+  padding: 18px 14px;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.ps-tile-value {
+  font-size: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.ps-tile-label {
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.ps-good .ps-tile-value {
+  color: var(--success);
+}
+
+.ps-mid .ps-tile-value {
+  color: var(--warning);
+}
+
+.ps-bad .ps-tile-value {
+  color: var(--danger);
+}
+
+/* ==========================================================================================
+   מחלף השפה
+   ==========================================================================================
+   העמודים הציבוריים נבנים בשתי שפות ובשני כיווני כתיבה. המרווחים כאן לוגיים
+   (inline-start/end) ולא ימין/שמאל, כך שאותו CSS נכון גם ב-RTL וגם ב-LTR. */
+
+.lp-top,
+.auth-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.lang-switch {
+  min-width: 84px;
 }

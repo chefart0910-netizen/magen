@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Seo from "../components/Seo";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import { useLang } from "../lib/LangContext";
 import { api } from "../lib/api";
 
 // MAGEN - עמוד הבית הציבורי.
@@ -9,34 +11,12 @@ import { api } from "../lib/api";
 // זה העמוד היחיד שגולש אנונימי וגוגל רואים, ולכן הוא צריך לומר בשורה אחת מה המוצר עושה
 // ולמי. שדה הסריקה נמצא למעלה בכוונה: מבקר שמקבל ציון אמיתי על האתר שלו לפני הרשמה הוא
 // מבקר שיש לו סיבה להירשם. התוצאה כאן חלקית - שלושה ממצאים בכותרת בלבד (ראו routes/public.js).
-
-const SEVERITY_LABEL = {
-  critical: "קריטי",
-  serious: "חמור",
-  moderate: "בינוני",
-  minor: "קל",
-};
-
-const CHECKS = [
-  {
-    title: "נגישות לפי תקן ישראלי 5568",
-    body: "בדיקה אוטומטית מול כלל הכשלים שנתפסים בכלים - ניגודיות, ניווט מקלדת, תוויות לטפסים וקוראי מסך. זה התחום שבו אתר ישראלי חשוף לתביעה.",
-  },
-  {
-    title: "אבטחה",
-    body: "כותרות אבטחה, עוגיות, תוקף תעודת TLS, אכיפת HTTPS, נתיבים חשופים כמו גיבוי wp-config, ותוכן מעורב. בדיקה פסיבית - לא נוגעים באתר.",
-  },
-  {
-    title: "ביצועים",
-    body: "Lighthouse על דפדפן אמיתי: מדדי Core Web Vitals, זמן טעינה, ומה בדיוק מאט את העמוד.",
-  },
-  {
-    title: "SEO טכני",
-    body: "מה שמונע מגוגל לקרוא ולדרג את העמודים - כותרות, תיאורים, מבנה וקישוריות.",
-  },
-];
+// כל הטקסטים מגיעים מ-lib/i18n.js, בעברית ובאנגלית.
 
 export default function Landing() {
+  const { t, path, lang } = useLang();
+  const L = t.landing;
+
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -47,13 +27,12 @@ export default function Landing() {
     setError("");
     setResult(null);
     if (!url.trim()) {
-      setError("נא להזין כתובת אתר");
+      setError(L.emptyUrl);
       return;
     }
     setLoading(true);
     try {
-      const data = await api.publicScan(url.trim());
-      setResult(data);
+      setResult(await api.publicScan(url.trim()));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -63,11 +42,7 @@ export default function Landing() {
 
   return (
     <main className="lp">
-      <Seo
-        title="בדיקת נגישות, אבטחה וביצועים לאתר"
-        description="MAGEN בודק את האתר שלכם ומחזיר דוח בעברית: נגישות לפי תקן ישראלי 5568, אבטחה, ביצועים ו-SEO. בדיקת אבטחה ראשונה חינם, בלי הרשמה."
-        path="/"
-      />
+      <Seo title={L.titleA} description={L.lead} path="/" />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
@@ -76,27 +51,28 @@ export default function Landing() {
             name: "MAGEN",
             applicationCategory: "SecurityApplication",
             operatingSystem: "Web",
-            inLanguage: "he-IL",
-            description:
-              "בדיקת בריאות אתר בעברית - נגישות לפי תקן ישראלי 5568, אבטחה, ביצועים ו-SEO.",
+            inLanguage: lang === "he" ? "he-IL" : "en",
+            description: L.lead,
             offers: { "@type": "Offer", price: "0", priceCurrency: "ILS" },
           })}
         </script>
       </Helmet>
 
+      <div className="lp-top">
+        <LanguageSwitcher />
+      </div>
+
       <section className="lp-hero">
-        <p className="lp-eyebrow">בריאות האתר שלך</p>
+        <p className="lp-eyebrow">{L.eyebrow}</p>
         <h1 className="lp-title">
-          האתר שלך עובד. <span className="lp-title-dim">השאלה היא מה שבור בו ואתה לא רואה.</span>
+          <span className="hello">{L.titleA}</span>{" "}
+          <span className="lp-title-dim">{L.titleB}</span>
         </h1>
-        <p className="lp-lead">
-          MAGEN סורק אתרים של עסקים קטנים ועצמאיים ומחזיר דוח בעברית: נגישות לפי תקן ישראלי
-          5568, אבטחה, ביצועים ו-SEO. בדיקת האבטחה הראשונה חינם, כאן, בלי להירשם.
-        </p>
+        <p className="lp-lead">{L.lead}</p>
 
         <form className="lp-scan" onSubmit={submit}>
           <label className="label" htmlFor="lp-url">
-            כתובת האתר שתיבדק
+            {L.urlLabel}
           </label>
           <div className="lp-scan-row">
             <input
@@ -105,18 +81,16 @@ export default function Landing() {
               type="text"
               inputMode="url"
               dir="ltr"
-              placeholder="example.co.il"
+              placeholder={L.urlPlaceholder}
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               autoComplete="url"
             />
             <button className="btn btn-primary" type="submit" disabled={loading}>
-              {loading ? "סורק…" : "בדוק את האתר"}
+              {loading ? L.scanning : L.scanBtn}
             </button>
           </div>
-          <p className="lp-scan-note">
-            בדיקה פסיבית בלבד - קוראים את מה שהאתר מחזיר לכל גולש, לא נוגעים בו ולא נכנסים אליו.
-          </p>
+          <p className="lp-scan-note">{L.passiveNote}</p>
         </form>
 
         {error && (
@@ -127,7 +101,7 @@ export default function Landing() {
 
         {loading && (
           <p className="lp-loading" role="status">
-            בודקים כותרות אבטחה, תעודת TLS, עוגיות ונתיבים חשופים. זה לוקח כמה שניות.
+            {L.loadingNote}
           </p>
         )}
 
@@ -135,7 +109,7 @@ export default function Landing() {
           <div className="lp-result card" aria-live="polite">
             <div className="lp-result-head">
               <div>
-                <div className="lp-result-label">ציון אבטחה</div>
+                <div className="lp-result-label">{L.scoreLabel}</div>
                 <div className="lp-result-url" dir="ltr">
                   {result.url}
                 </div>
@@ -147,40 +121,38 @@ export default function Landing() {
             </div>
 
             <div className="lp-sev">
-              {Object.entries(SEVERITY_LABEL).map(([key, label]) => (
+              {Object.keys(t.severity).map((key) => (
                 <div className="lp-sev-item" key={key}>
-                  <span className={`lp-sev-count lp-sev-${key}`}>{result.by_severity?.[key] ?? 0}</span>
-                  <span className="lp-sev-label">{label}</span>
+                  <span className={`lp-sev-count lp-sev-${key}`}>
+                    {result.by_severity?.[key] ?? 0}
+                  </span>
+                  <span className="lp-sev-label">{t.severity[key]}</span>
                 </div>
               ))}
             </div>
 
             {result.preview?.length > 0 ? (
               <>
-                <h2 className="lp-result-sub">הממצאים הבולטים</h2>
+                <h2 className="lp-result-sub">{L.findingsTitle}</h2>
                 <ul className="lp-findings">
                   {result.preview.map((f, i) => (
                     <li key={i}>
-                      <span className={`chip lp-sev-${f.severity}`}>{SEVERITY_LABEL[f.severity]}</span>
+                      <span className={`chip lp-sev-${f.severity}`}>
+                        {t.severity[f.severity] || f.severity}
+                      </span>
                       <span>{f.title}</span>
                     </li>
                   ))}
                 </ul>
               </>
             ) : (
-              <p className="lp-clean">
-                לא נמצאו ממצאי אבטחה פסיביים באתר הזה. זה מצב טוב - ונבדק כאן רק חלק אחד מהתמונה.
-              </p>
+              <p className="lp-clean">{L.clean}</p>
             )}
 
             <div className="lp-locked">
-              <p>
-                {result.locked_count > 0
-                  ? `נותרו עוד ${result.locked_count} ממצאים, וההסבר מה לעשות עם כל אחד מהם.`
-                  : "הדוח המלא כולל גם נגישות לפי תקן ישראלי 5568, ביצועים ו-SEO."}
-              </p>
-              <Link className="btn btn-primary" to="/signup">
-                פתיחת חשבון וקבלת הדוח המלא
+              <p>{result.locked_count > 0 ? L.lockedMore(result.locked_count) : L.lockedNone}</p>
+              <Link className="btn btn-primary" to={path("/signup")}>
+                {L.cta}
               </Link>
             </div>
           </div>
@@ -188,9 +160,9 @@ export default function Landing() {
       </section>
 
       <section className="lp-section">
-        <h2>מה נבדק</h2>
+        <h2>{L.checksTitle}</h2>
         <div className="lp-grid">
-          {CHECKS.map((c) => (
+          {L.checks.map((c) => (
             <article className="card lp-check" key={c.title}>
               <h3>{c.title}</h3>
               <p>{c.body}</p>
@@ -200,31 +172,25 @@ export default function Landing() {
       </section>
 
       <section className="lp-section">
-        <h2>למי זה מיועד</h2>
-        <p className="lp-lead">
-          לעסקים קטנים, עצמאיים ובעלי אתר בודד - מי שאין לו ספק אבטחה ואין לו מי שיבדוק את
-          האתר אחרי שהוא הוקם. חברות גדולות כבר מכוסות; הפער נמצא כאן.
-        </p>
-        <p className="lp-lead">
-          בנוסף, אנשי מקצוע שבונים אתרים יכולים לצרף לדוח חוות דעת אנושית משלהם - הלקוח מקבל
-          גם את המספרים וגם מה לעשות איתם.
-        </p>
+        <h2>{L.audienceTitle}</h2>
+        <p className="lp-lead">{L.audienceA}</p>
+        <p className="lp-lead">{L.audienceB}</p>
       </section>
 
       <section className="lp-cta">
-        <h2>בדיקה אחת, בעברית, בלי כרטיס אשראי</h2>
+        <h2>{L.ctaTitle}</h2>
         <div className="lp-cta-row">
-          <Link className="btn btn-primary" to="/signup">
-            פתיחת חשבון
+          <Link className="btn btn-primary" to={path("/signup")}>
+            {L.ctaSignup}
           </Link>
-          <Link className="btn btn-secondary" to="/login">
-            כבר יש לי חשבון
+          <Link className="btn btn-secondary" to={path("/login")}>
+            {L.ctaLogin}
           </Link>
         </div>
       </section>
 
       <footer className="lp-footer">
-        <Link to="/accessibility">הצהרת נגישות</Link>
+        <Link to={path("/accessibility")}>{t.nav.accessibility}</Link>
       </footer>
     </main>
   );

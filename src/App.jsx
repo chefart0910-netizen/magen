@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./lib/AuthContext";
+import { LangProvider, useRootLanguageRedirect } from "./lib/LangContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
@@ -10,65 +11,112 @@ import Admin from "./pages/Admin";
 import AccessibilityStatement from "./pages/AccessibilityStatement";
 import ScanReport from "./pages/ScanReport";
 import Landing from "./pages/Landing";
+import PublicScan from "./pages/PublicScan";
 
-export default function App() {
+// MAGEN - הניתוב.
+// ==========================================================================================
+// שתי שפות, שתי קידומות: עברית בשורש, אנגלית תחת /en. אותו עץ מסלולים נרשם פעמיים, כי
+// לכל שפה צריכה להיות כתובת נפרדת שגוגל מאנדקס לחוד - אחרת האנגלית לא מדורגת, וזו כל
+// הסיבה שהוספנו אותה. השפה עצמה נקראת מהכתובת ב-LangProvider.
+
+function routesFor(prefix, user) {
+  const p = (path) => `${prefix}${path}`;
+  const to = (path) => `${prefix}${path}`;
+
+  return [
+    <Route
+      key={`${prefix}-login`}
+      path={p("/login")}
+      element={user ? <Navigate to={to("/dashboard")} replace /> : <Login />}
+    />,
+    <Route
+      key={`${prefix}-signup`}
+      path={p("/signup")}
+      element={user ? <Navigate to={to("/dashboard")} replace /> : <Signup />}
+    />,
+
+    <Route
+      key={`${prefix}-dashboard`}
+      path={p("/dashboard")}
+      element={
+        <ProtectedRoute>
+          <Layout>
+            <Dashboard />
+          </Layout>
+        </ProtectedRoute>
+      }
+    />,
+    <Route
+      key={`${prefix}-site`}
+      path={p("/sites/:siteId")}
+      element={
+        <ProtectedRoute>
+          <Layout>
+            <SiteDetail />
+          </Layout>
+        </ProtectedRoute>
+      }
+    />,
+    <Route
+      key={`${prefix}-admin`}
+      path={p("/admin")}
+      element={
+        <ProtectedRoute requireAdmin>
+          <Layout>
+            <Admin />
+          </Layout>
+        </ProtectedRoute>
+      }
+    />,
+
+    // דוח הלקוח נפתח ללא ה-Layout של האפליקציה (ניווט, פוטר, ווידג'ט הנגישות) - הוא
+    // נועד לצאת כ-PDF, וכל מה שאינו חלק מהדוח עצמו לא אמור להופיע בו.
+    <Route
+      key={`${prefix}-report`}
+      path={p("/report/:scanId")}
+      element={
+        <ProtectedRoute>
+          <ScanReport />
+        </ProtectedRoute>
+      }
+    />,
+
+    // תוצאת סריקה שבעל אתר מאומת בחר לפרסם. ציבורי לחלוטין ואינדקסבילי - זו נקודת
+    // הכניסה של מי שקיבל קישור בוואטסאפ ולא מכיר את MAGEN.
+    <Route key={`${prefix}-public-scan`} path={p("/s/:slug")} element={<PublicScan />} />,
+
+    // הצהרת הנגישות חייבת להיות נגישה לכל אחד, גם למי שאינו מחובר - זו דרישה
+    // פורמלית וגם דבר שלקוח פוטנציאלי בודק לפני שהוא נרשם.
+    <Route key={`${prefix}-a11y`} path={p("/accessibility")} element={<AccessibilityStatement />} />,
+
+    // עמוד הבית הציבורי. משתמש מחובר ממשיך ישר לדשבורד.
+    <Route
+      key={`${prefix}-home`}
+      path={prefix || "/"}
+      element={user ? <Navigate to={to("/dashboard")} replace /> : <Landing />}
+    />,
+  ];
+}
+
+function AppRoutes() {
   const { user } = useAuth();
+  useRootLanguageRedirect();
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
-
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/sites/:siteId"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <SiteDetail />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requireAdmin>
-            <Layout>
-              <Admin />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* דוח הלקוח נפתח ללא ה-Layout של האפליקציה (ניווט, פוטר, ווידג'ט הנגישות) - הוא
-          נועד לצאת כ-PDF, וכל מה שאינו חלק מהדוח עצמו לא אמור להופיע בו. */}
-      <Route
-        path="/report/:scanId"
-        element={
-          <ProtectedRoute>
-            <ScanReport />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* הצהרת הנגישות חייבת להיות נגישה לכל אחד, גם למי שאינו מחובר - זו דרישה
-          פורמלית וגם דבר שלקוח פוטנציאלי בודק לפני שהוא נרשם. */}
-      <Route path="/accessibility" element={<AccessibilityStatement />} />
-
-      {/* עמוד הבית הציבורי. עד עכשיו "/" הפנה ל-/login, כלומר גולש חדש וגוגל ראו מסך
-          התחברות ולא הבינו מה המוצר עושה. משתמש מחובר ממשיך ישר לדשבורד. */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+      {routesFor("/en", user)}
+      {routesFor("", user)}
+      {/* כתובת לא מוכרת: מחזירים לשורש ולא למסך התחברות, כדי שמבקר חדש שהקליק על
+          קישור שבור יראה מה המוצר עושה במקום טופס. */}
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
     </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <LangProvider>
+      <AppRoutes />
+    </LangProvider>
   );
 }

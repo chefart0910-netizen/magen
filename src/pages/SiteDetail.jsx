@@ -4,6 +4,8 @@ import { api } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
 import ExpertReview from "../components/ExpertReview";
 import VerifyOwnership from "../components/VerifyOwnership";
+import ExpertAccess from "../components/ExpertAccess";
+import SharePublic from "../components/SharePublic";
 import {
   formatDate,
   scoreClass,
@@ -390,7 +392,12 @@ export default function SiteDetail() {
         onVerified={load}
       />
 
+      <ExpertAccess siteId={siteId} />
+
       {selected && <ScanResultCard scan={selected} />}
+      {selected?.id && (
+        <SharePublic siteId={siteId} scan={selected} verified={!!site.ownership_verified} />
+      )}
       {selected?.id && <ExpertReview scanId={selected.id} scanStatus={selected.status} />}
 
       <div className="card" style={{ marginTop: 16 }}>

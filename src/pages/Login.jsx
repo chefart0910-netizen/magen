@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
+import { useLang } from "../lib/LangContext";
 import Seo from "../components/Seo";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { t, path } = useLang();
+  const L = t.login;
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,7 +20,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate("/dashboard");
+      navigate(path("/dashboard"));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -26,14 +30,13 @@ export default function Login() {
 
   return (
     <main className="auth-shell">
-      <Seo
-        title="התחברות"
-        description="התחברו לחשבון MAGEN כדי לסרוק את האתר שלכם ולצפות בדוחות ביצועים, נגישות, SEO ואבטחה."
-        path="/login"
-      />
+      <Seo title={L.title} description={L.seoDesc} path="/login" />
       <div className="auth-card card">
-        <h1>התחברות</h1>
-        <div className="sub">שמחים לראות אותך שוב.</div>
+        <div className="auth-top">
+          <LanguageSwitcher />
+        </div>
+        <h1>{L.title}</h1>
+        <div className="sub">{L.sub}</div>
 
         {/* role=alert: בלעדיו קורא מסך לא מודיע למשתמש שההתחברות נכשלה. */}
         {error && (
@@ -44,11 +47,12 @@ export default function Login() {
 
         <form onSubmit={submit}>
           <div className="form-field">
-            <label className="label" htmlFor="login-email">אימייל</label>
+            <label className="label" htmlFor="login-email">{L.email}</label>
             <input
               className="input"
               id="login-email"
               type="email"
+              dir="ltr"
               autoComplete="email"
               required
               autoFocus
@@ -57,11 +61,12 @@ export default function Login() {
             />
           </div>
           <div className="form-field">
-            <label className="label" htmlFor="login-password">סיסמה</label>
+            <label className="label" htmlFor="login-password">{L.password}</label>
             <input
               className="input"
               id="login-password"
               type="password"
+              dir="ltr"
               autoComplete="current-password"
               required
               value={form.password}
@@ -69,12 +74,12 @@ export default function Login() {
             />
           </div>
           <button className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? "מתחבר..." : "התחבר"}
+            {loading ? L.submitting : L.submit}
           </button>
         </form>
 
         <div className="form-footer">
-          עדיין אין לך חשבון? <Link to="/signup">הרשם עכשיו</Link>
+          {L.noAccount} <Link to={path("/signup")}>{L.signupLink}</Link>
         </div>
       </div>
     </main>
