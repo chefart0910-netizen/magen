@@ -9,6 +9,7 @@ import { formatDate } from "../lib/format";
 
 export default function ExpertAccess({ siteId }) {
   const [grants, setGrants] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -20,6 +21,8 @@ export default function ExpertAccess({ siteId }) {
       setGrants(data.grants || []);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,7 +104,12 @@ export default function ExpertAccess({ siteId }) {
         </div>
       </form>
 
-      {active.length === 0 ? (
+      {/* גובה שמור: רשימת ההרשאות מגיעה מהשרת, ובלי מקום שמור הפאנל תופח כשהיא חוזרת
+          ודוחף את מה שמתחתיו - זה מה שנמדד כ-CLS בעמוד הזה. */}
+      <div className="vo-slot vo-slot-sm">
+      {loading ? (
+        <div className="text-dim">טוען הרשאות…</div>
+      ) : active.length === 0 ? (
         <div className="text-dim">אף מומחה אינו מורשה לאתר הזה.</div>
       ) : (
         <table className="table">
@@ -136,6 +144,7 @@ export default function ExpertAccess({ siteId }) {
           </tbody>
         </table>
       )}
+      </div>
     </div>
   );
 }

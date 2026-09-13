@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { useAuth } from "../lib/AuthContext";
 
 // MAGEN - פאנל אימות בעלות על אתר.
 // ==========================================================================================
 // קודם כאן היה כפתור אחד שהדליק את הדגל בלי לבדוק דבר. עכשיו המשתמש מקבל אסימון ושלוש
 // דרכים לשים אותו, והשרת בודק בפועל (ראו lib/routes/sites.js). הדגל הזה הוא מה שפותח
 // בדיקת עומס מלאה ופנטסט אקטיבי - בדיקות שמותר להריץ רק על אתר שלך.
+//
+// יציבות פריסה: הפאנל נבנה במבנה הסופי שלו מיד, ורק האסימון עצמו מתחלף כשהתשובה חוזרת
+// מהשרת. הגרסה הקודמת רינדרה "כלום" עד שהמידע הגיע ואז תפחה - וזה נמדד כ-CLS והוריד את
+// ציון הביצועים של העמוד. מבנה זהה לפני ואחרי = אפס תזוזה. מסיבה זו גם דגל האדמין נלקח
+// מ-AuthContext, שזמין כבר בציור הראשון, ולא מתשובת השרת.
 
 const METHOD_LABEL = {
   dns: "רשומת DNS",
@@ -13,6 +19,8 @@ const METHOD_LABEL = {
   meta: "תג meta",
   admin: "אדמין",
 };
+
+const TOKEN_PLACEHOLDER = "································";
 
 function Row({ label, value }) {
   return (
@@ -26,6 +34,9 @@ function Row({ label, value }) {
 }
 
 export default function VerifyOwnership({ siteId, verified, onVerified }) {
+  const { user } = useAuth();
+  const isAdmin = !!user?.is_admin;
+
   const [info, setInfo] = useState(null);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
@@ -73,6 +84,15 @@ export default function VerifyOwnership({ siteId, verified, onVerified }) {
     );
   }
 
+  const token = info?.token || TOKEN_PLACEHOLDER;
+  const host = (() => {
+    try {
+      return info?.instructions?.dns?.name || "_magen.example.co.il";
+    } catch {
+      return "_magen.example.co.il";
+    }
+  })();
+
   return (
     <div className="card vo">
       <h2 className="vo-title">אימות בעלות</h2>
@@ -81,14 +101,12 @@ export default function VerifyOwnership({ siteId, verified, onVerified }) {
         שהוכחתם שהוא שלכם. בדיקות הביצועים, הנגישות והאבטחה הפסיבית לא דורשות אימות.
       </p>
 
-      {info?.admin_exempt && (
+      {isAdmin ? (
         <div className="info-banner">
           חשבון אדמין: לחיצה על "בדוק אימות" תאמת מיד בלי בדיקה חיצונית, כדי שתוכל לבחון את
           המערכת. האחריות על מה שמופעל היא שלך.
         </div>
-      )}
-
-      {info?.token && !info.admin_exempt && (
+      ) : (
         <>
           <p className="vo-p">
             בחרו <strong>דרך אחת</strong> מהשלוש, ואז לחצו "בדוק אימות".
@@ -96,22 +114,22 @@ export default function VerifyOwnership({ siteId, verified, onVerified }) {
           <div className="vo-methods">
             <div className="vo-method">
               <h3>1. רשומת DNS (החזק ביותר)</h3>
-              <Row label="שם" value={info.instructions.dns.name} />
-              <Row label="סוג" value={info.instructions.dns.type} />
-              <Row label="ערך" value={info.instructions.dns.value} />
+              <Row label="שם" value={host} />
+              <Row label="סוג" value="TXT" />
+              <Row label="ערך" value={`magen-verify=${token}`} />
               <p className="text-dim vo-note">עדכון DNS יכול לקחת עד כמה שעות עד שהוא נראה.</p>
             </div>
 
             <div className="vo-method">
               <h3>2. קובץ באתר</h3>
-              <Row label="נתיב" value={info.instructions.file.path} />
-              <Row label="תוכן" value={info.instructions.file.content} />
+              <Row label="נתיב" value="/.well-known/magen-verify.txt" />
+              <Row label="תוכן" value={token} />
               <p className="text-dim vo-note">קובץ טקסט שמכיל את השורה הזו בלבד.</p>
             </div>
 
             <div className="vo-method">
               <h3>3. תג meta בעמוד הבית</h3>
-              <Row label="תג" value={info.instructions.meta.tag} />
+              <Row label="תג" value={`<meta name="magen-verify" content="${token}">`} />
               <p className="text-dim vo-note">
                 בוורדפרס: בתוך ה-&lt;head&gt; של התבנית או דרך תוסף שמוסיף קוד ל-head.
               </p>
@@ -126,7 +144,7 @@ export default function VerifyOwnership({ siteId, verified, onVerified }) {
         </div>
       )}
 
-      <button className="btn btn-secondary" onClick={check} disabled={checking}>
+      <button className="btn btn-secondary" onClick={check} disabled={checking || !info}>
         {checking && <span className="spinner" />} בדוק אימות
       </button>
     </div>
