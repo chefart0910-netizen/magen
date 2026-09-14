@@ -1633,3 +1633,75 @@ body.report-mode {
 .vo-slot-sm {
   min-height: 96px;
 }
+
+/* הערת הבהרה בכרטיס ציון ובסעיף הנגישות שבדוח הלקוח.
+   הנוסח הזה הוא מה שמגן על MAGEN: ציון 100 בבדיקה אוטומטית אינו עמידה בתקן, והדוח
+   חייב לומר את זה בעצמו - במיוחד כשהוא מגיע ללקוח שמסתמך עליו מול דרישה חוקית. */
+
+.rep-score-note {
+  margin-top: 3px;
+  font-size: 10.5px;
+  opacity: 0.75;
+}
+
+.rep-caveat {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-inline-start: 3px solid #c9ccd6;
+  background: #f6f7f9;
+  color: #3b4252;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* ==========================================================================================
+   פאנל התקדמות הסריקה (components/ScanProgress.jsx)
+   ==========================================================================================
+   נמדד בפועל: סריקה של אתר GIS ממשלתי ארכה 6 דקות ו-4 שניות. ספינר בלי טיימר ובלי
+   הסבר נקרא "תקוע" - הטיימר והשלב הנוכחי הם מה שמבדיל בין המתנה סבירה לתקלה. */
+
+.sp {
+  margin-top: 16px;
+}
+
+.sp-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sp-head > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sp-stage {
+  margin-top: 2px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.sp-timer {
+  flex: 0 0 auto;
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+.sp-note {
+  margin: 14px 0 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.65;
+  max-width: 70ch;
+}
+
+.sp-heavy {
+  margin-top: 14px;
+}

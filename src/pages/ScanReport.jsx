@@ -16,20 +16,25 @@ import { SCORE_OPINION_LABELS } from "../lib/reviews";
 const IMPACT_ORDER = { critical: 0, serious: 1, moderate: 2, minor: 3 };
 const SEVERITY_WEIGHT = { critical: 12, serious: 7, moderate: 3, minor: 1 };
 
+// "תקין" הוחלף ב"עבר את הבדיקות". ההבדל אינו סמנטי: ציון 100 בנגישות אומר שכל הכללים
+// שניתן לבדוק אוטומטית עברו - לא שהאתר עומד בתקן. תקן ת"י 5568 כולל דרישות שכלי אוטומטי
+// אינו יכול להכריע בהן (ניווט מקלדת בפועל, טקסט חלופי משמעותי, הבנה של מבנה). דוח שכותב
+// "תקין" ליד 100 יוצר מצג שווא, וזו החשיפה האמיתית של MAGEN - לא חוסר הידע.
 function grade(score) {
   if (score === null || score === undefined) return { text: "לא נבדק", cls: "na" };
-  if (score >= 90) return { text: "תקין", cls: "good" };
+  if (score >= 90) return { text: "עבר את הבדיקות", cls: "good" };
   if (score >= 50) return { text: "דורש שיפור", cls: "mid" };
   return { text: "טעון טיפול", cls: "bad" };
 }
 
-function Score({ label, value }) {
+function Score({ label, value, note }) {
   const g = grade(value);
   return (
     <div className={`rep-score rep-${g.cls}`}>
       <div className="rep-score-num">{value ?? "—"}</div>
       <div className="rep-score-label">{label}</div>
       <div className="rep-score-grade">{g.text}</div>
+      {note && <div className="rep-score-note">{note}</div>}
     </div>
   );
 }
@@ -99,6 +104,12 @@ function AccessibilitySection({ accessibility }) {
         נבדקו {accessibility.passes_count + accessibility.violations_count} כללי נגישות אוטומטיים
         (axe-core, מבוסס WCAG 2.1). {accessibility.passes_count} עברו בהצלחה,{" "}
         {accessibility.violations_count} נכשלו.
+      </p>
+
+      <p className="rep-caveat">
+        בדיקה אוטומטית מזהה חלק מדרישות הנגישות. דרישות אחרות בתקן הישראלי ת"י 5568 -
+        בהן ניווט מקלדת בפועל, טקסט חלופי משמעותי לתמונות והבנת מבנה העמוד - מחייבות בדיקה
+        אנושית. דוח זה אינו קובע עמידה בתקן ואינו מהווה חלופה לביקורת נגישות.
       </p>
 
       {violations.length === 0 ? (
@@ -361,7 +372,7 @@ export default function ScanReport() {
             </>
           ) : (
             <>
-              <Score label="נגישות" value={result.accessibility?.computed_score} />
+              <Score label="נגישות" value={result.accessibility?.computed_score} note="בדיקה אוטומטית" />
               <Score label="ביצועים" value={result.lighthouse?.performance} />
               <Score label="תקינות" value={result.lighthouse?.best_practices} />
               <Score label="SEO" value={result.lighthouse?.seo} />

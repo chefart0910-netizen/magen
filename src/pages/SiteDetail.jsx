@@ -6,6 +6,7 @@ import ExpertReview from "../components/ExpertReview";
 import VerifyOwnership from "../components/VerifyOwnership";
 import ExpertAccess from "../components/ExpertAccess";
 import SharePublic from "../components/SharePublic";
+import ScanProgress from "../components/ScanProgress";
 import {
   formatDate,
   scoreClass,
@@ -233,6 +234,8 @@ export default function SiteDetail() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [running, setRunning] = useState(null); // key of the running action
+  // מתי התחילה הסריקה האסינכרונית שרצה כרגע, אם יש כזו. מזין את ScanProgress.
+  const [scanStartedAt, setScanStartedAt] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -263,9 +266,18 @@ export default function SiteDetail() {
   // מגיעה לשרת דקה-שתיים אחר כך דרך ה-callback. עד אז מרעננים את ההיסטוריה כל כמה
   // שניות ומחכים שהרשומה תצא ממצב "רץ".
   const waitForScan = async (scanId) => {
-    const deadline = Date.now() + 8 * 60 * 1000;
+    // 12 דקות: ל-workflow עצמו יש timeout של 15, וסריקה של אתר כבד נמדדה ב-6 דקות.
+    // 8 דקות היו קצרות מדי וגרמו להצגת "עדיין רצה" על סריקות שהיו בדרך.
+    const deadline = Date.now() + 12 * 60 * 1000;
+    let attempt = 0;
+
     while (Date.now() < deadline) {
-      await new Promise((r) => setTimeout(r, 5000));
+      // האטה הדרגתית: 5 שניות בהתחלה ועד 15 שניות. בקצב הקודם (6 שניות קבוע) סריקה
+      // אחת ייצרה יותר מ-60 בקשות לשרת, וזה מיותר בתהליך שאורכו דקות.
+      const delay = Math.min(15000, 5000 + Math.floor(attempt / 3) * 2500);
+      attempt += 1;
+      await new Promise((r) => setTimeout(r, delay));
+
       let data;
       try {
         data = await api.listScans(siteId);
@@ -284,7 +296,10 @@ export default function SiteDetail() {
       }
       return;
     }
-    setError("הבדיקה עדיין רצה. רעננו את העמוד בעוד כמה דקות כדי לראות את התוצאה.");
+    // לא כשל: הסריקה ממשיכה על ה-runner גם אחרי שהפסקנו לשאול.
+    setNotice(
+      "הבדיקה ממשיכה לרוץ ברקע. אפשר לעזוב את הדף — התוצאה תופיע בהיסטוריית הבדיקות כשתהיה מוכנה."
+    );
   };
 
   const runAction = async (key, fn) => {
@@ -300,9 +315,11 @@ export default function SiteDetail() {
         return;
       }
       if (result?.async && result?.scan_id) {
-        setNotice("הבדיקה רצה כעת ברקע. התוצאה תופיע כאן אוטומטית כשתהיה מוכנה.");
+        // ההודעה הוחלפה בפאנל ScanProgress: טיימר, שלב נוכחי, וטווח זמן מצופה.
+        setScanStartedAt(Date.now());
         await load();
         await waitForScan(result.scan_id);
+        setScanStartedAt(null);
         return;
       }
       setNotice("הבדיקה הסתיימה בהצלחה.");
@@ -316,6 +333,7 @@ export default function SiteDetail() {
       setError(err.message);
     } finally {
       setRunning(null);
+      setScanStartedAt(null);
     }
   };
 
@@ -393,6 +411,8 @@ export default function SiteDetail() {
       />
 
       <ExpertAccess siteId={siteId} />
+
+      {scanStartedAt && <ScanProgress startedAt={scanStartedAt} />}
 
       {selected && <ScanResultCard scan={selected} />}
       {selected?.id && (
