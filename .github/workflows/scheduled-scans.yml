@@ -1,0 +1,54 @@
+# MAGEN - הפעלת הסריקות המתוזמנות.
+# ==========================================================================================
+# רץ פעם ביום ומבקש מהשרת לבדוק אילו אתרים "הגיע להם" תור סריקה. השרת עצמו מחליט מי
+# נסרק (lib/routes/cron.js) - ה-workflow הזה הוא רק השעון.
+#
+# למה Actions ולא cron של Vercel: תשתית ה-Actions כאן כבר עובדת, היא חינמית, ואפשר
+# להריץ בכל תדירות בלי להיתלות במגבלות התוכנית.
+#
+# נדרשים שני Repository secrets:
+#   MAGEN_CRON_URL     - https://<הדומיין>/api/cron/scheduled-scans
+#   MAGEN_CRON_SECRET  - אותו ערך בדיוק שמוגדר כ-CRON_SECRET ב-Environment Variables בוורסל
+#
+# workflow_dispatch קיים כדי שאפשר יהיה להריץ ידנית ולראות שזה עובד, בלי לחכות ליום.
+
+name: scheduled scans
+
+on:
+  schedule:
+    # 04:10 UTC בכל יום. שעה מתה בישראל, כדי שהסריקות לא יתחרו בתעבורה אמיתית של הלקוח.
+    - cron: "10 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: בדיקת סודות
+        run: |
+          missing=""
+          [ -z "${{ secrets.MAGEN_CRON_URL }}" ] && missing="$missing MAGEN_CRON_URL"
+          [ -z "${{ secrets.MAGEN_CRON_SECRET }}" ] && missing="$missing MAGEN_CRON_SECRET"
+          if [ -n "$missing" ]; then
+            echo "::error::חסרים Repository secrets:$missing - הוסיפו אותם ב-Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+
+      - name: הפעלת הסריקות המתוזמנות
+        run: |
+          # -s בלי -S היה מסתיר שגיאות רשת, וזה בדיוק סוג הכישלון השקט שכבר עלה לנו
+          # שלושה ימים. כאן הגוף והסטטוס מודפסים תמיד.
+          body=$(mktemp)
+          code=$(curl -sS -o "$body" -w '%{http_code}' \
+            -X POST "${{ secrets.MAGEN_CRON_URL }}" \
+            -H "x-cron-secret: ${{ secrets.MAGEN_CRON_SECRET }}" \
+            -H 'content-type: application/json' \
+            --max-time 60)
+          echo "HTTP $code"
+          cat "$body"
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::הנתיב החזיר $code - ראו את גוף התשובה למעלה"
+            exit 1
+          fi

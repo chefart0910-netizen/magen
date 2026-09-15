@@ -54,6 +54,10 @@ export const api = {
   getVerification: (id) => request(`/sites/${id}/verification`),
   verifyOwnership: (id) => request(`/sites/${id}/verify-ownership`, { method: "POST" }),
 
+  // תזמון סריקה אוטומטית. "off" מכבה (ראו lib/routes/sites.js).
+  setSchedule: (siteId, schedule) =>
+    request(`/sites/${siteId}/schedule`, { method: "PATCH", body: { schedule } }),
+
   runScan: (siteId) => request(`/sites/${siteId}/scans`, { method: "POST" }),
   listScans: (siteId) => request(`/sites/${siteId}/scans`),
   getScanDetail: (scanId) => request(`/sites/detail/${scanId}`),

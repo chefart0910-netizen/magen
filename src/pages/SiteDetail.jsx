@@ -7,6 +7,7 @@ import VerifyOwnership from "../components/VerifyOwnership";
 import ExpertAccess from "../components/ExpertAccess";
 import SharePublic from "../components/SharePublic";
 import ScanProgress from "../components/ScanProgress";
+import ScanSchedule from "../components/ScanSchedule";
 import {
   formatDate,
   scoreClass,
@@ -408,6 +409,12 @@ export default function SiteDetail() {
         siteId={siteId}
         verified={!!site.ownership_verified}
         onVerified={load}
+      />
+
+      <ScanSchedule
+        siteId={siteId}
+        schedule={site.scan_schedule}
+        onChange={(updated) => setSite(updated)}
       />
 
       <ExpertAccess siteId={siteId} />
