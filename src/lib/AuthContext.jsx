@@ -5,13 +5,29 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem("magen_user");
-    return raw ? JSON.parse(raw) : null;
+    // בלי try/catch כאן, כל חלון שבו אחסון האתר חסום (ספארי פרטי, חסימת צד-שלישי) או
+    // כל ערך פגום ב-localStorage הפילו את כל האפליקציה למסך לבן בזמן הרינדור הראשון,
+    // בלי דרך להתאושש. שאר הקוד (i18n, ווידג'ט הנגישות) כבר מגן על עצמו כך.
+    try {
+      const raw = localStorage.getItem("magen_user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      try {
+        localStorage.removeItem("magen_user");
+      } catch {
+        // אין מה לעשות - ממשיכים כאורח.
+      }
+      return null;
+    }
   });
 
   const persist = (token, user) => {
-    localStorage.setItem("magen_token", token);
-    localStorage.setItem("magen_user", JSON.stringify(user));
+    try {
+      localStorage.setItem("magen_token", token);
+      localStorage.setItem("magen_user", JSON.stringify(user));
+    } catch {
+      // אחסון חסום: ההתחברות עדיין תקפה לטאב הזה, היא פשוט לא תישמר לרענון הבא.
+    }
     setUser(user);
   };
 
@@ -28,8 +44,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("magen_token");
-    localStorage.removeItem("magen_user");
+    try {
+      localStorage.removeItem("magen_token");
+      localStorage.removeItem("magen_user");
+    } catch {
+      // אחסון חסום - אין מה לנקות.
+    }
     setUser(null);
   }, []);
 

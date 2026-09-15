@@ -71,10 +71,18 @@ export default function ExpertReview({ scanId, scanStatus }) {
           expert_title: mine.expert_title || "",
           score_opinion: mine.score_opinion || "",
         });
+      } else {
+        // בלי האיפוס הזה, מומחה שכתב חוות דעת על סריקה אחת ופתח סריקה אחרת מצא את
+        // הטקסט הקודם ממתין בטופס - ושמירה אחת לא-קשובה מפרסמת חוות דעת שגויה בדוח
+        // של לקוח אחר.
+        setForm(EMPTY_FORM);
       }
     } catch (err) {
-      // 403 כאן אינו תקלה: משתמש שאינו בעל האתר ואינו מומחה פשוט לא רואה את המקטע.
-      setError("");
+      // 403 אינו תקלה: משתמש שאינו בעל האתר ואינו מומחה פשוט לא רואה את המקטע. כל
+      // שגיאה אחרת כן צריכה להיראות, אחרת המקטע נעלם בשקט.
+      const message = String(err?.message || "");
+      const isForbidden = /הרשאה|403/.test(message);
+      setError(isForbidden ? "" : message);
     }
   }, [scanId]);
 

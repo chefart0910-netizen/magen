@@ -48,8 +48,11 @@ export default function VerifyOwnership({ siteId, verified, onVerified }) {
       .then((data) => {
         if (alive) setInfo(data);
       })
-      .catch(() => {
-        /* הוראות האימות אינן חוסמות את שאר העמוד */
+      .catch((err) => {
+        // עד כה השגיאה נבלעה: info נשאר null, ולכן המשתמש ראה אסימון מדומה ודומיין
+        // לדוגמה, עם כפתור "בדוק אימות" מושבת לנצח ובלי שום הסבר - וזה חוסם גם את
+        // בדיקת העומס והפנטסט, ששניהם דורשים אימות.
+        if (alive) setError(err?.message || "לא הצלחנו לטעון את הוראות האימות. נסו לרענן את הדף.");
       });
     return () => {
       alive = false;

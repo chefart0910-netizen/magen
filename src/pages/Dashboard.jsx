@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
+import { useLang } from "../lib/LangContext";
 import { formatDate } from "../lib/format";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { path } = useLang();
+  const addButtonRef = useRef(null);
   const [sites, setSites] = useState(null);
   const [error, setError] = useState("");
   const [showAdd, setShowAdd] = useState(false);
@@ -18,10 +21,29 @@ export default function Dashboard() {
     try {
       const data = await api.listSites();
       setSites(data.sites);
+      setError("");
     } catch (err) {
       setError(err.message);
+      // בלי זה sites נשאר null, ותנאי הטעינה למטה הציג "טוען..." *מתחת* להודעת השגיאה
+      // לנצח, בלי שום דרך לנסות שוב.
+      setSites([]);
     }
   };
+
+  // Escape סוגר את הדיאלוג, והמיקוד חוזר לכפתור שפתח אותו - אחרת משתמש מקלדת נשאר
+  // "תקוע" אחרי סגירה בלי לדעת איפה הוא.
+  useEffect(() => {
+    if (!showAdd) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setShowAdd(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [showAdd]);
+
+  useEffect(() => {
+    if (!showAdd && addButtonRef.current) addButtonRef.current.focus();
+  }, [showAdd]);
 
   useEffect(() => {
     load();
@@ -85,7 +107,7 @@ export default function Dashboard() {
               : "מעקב אחרי ביצועים, נגישות, אבטחה ועומס לכל האתרים שלך."}
           </div>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAdd(true)}>
+        <button ref={addButtonRef} className="btn btn-primary" onClick={() => setShowAdd(true)}>
           + הוספת אתר
         </button>
       </div>
@@ -129,7 +151,7 @@ export default function Dashboard() {
               </div>
 
               <div className="site-actions">
-                <Link className="btn btn-primary btn-sm" to={`/sites/${site.id}`}>
+                <Link className="btn btn-primary btn-sm" to={path(`/sites/${site.id}`)}>
                   פתח / הרץ בדיקה
                 </Link>
                 {!site.ownership_verified && (
@@ -156,23 +178,36 @@ export default function Dashboard() {
 
       {showAdd && (
         <div className="modal-overlay" onClick={() => setShowAdd(false)}>
-          <div className="card modal" onClick={(e) => e.stopPropagation()}>
-            <h1 style={{ fontSize: 18, marginTop: 0 }}>הוספת אתר</h1>
+          {/* דיאלוג אמיתי: role + aria-modal + שם נגיש, ו-Escape סוגר. עד כה זה היה
+              div בלי סמנטיקה - קורא מסך לא ידע שנפתח חלון, ומשתמש מקלדת לא יכול היה
+              לסגור אותו. בכלי שמוכר בדיקות נגישות, טופס הקלט היחיד באפליקציה גם היה
+              חסר קישור בין ה-label ל-input: בדיוק הכלל "label" שאנחנו מדווחים ללקוחות. */}
+          <div
+            className="card modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-site-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="add-site-title" style={{ fontSize: 18, marginTop: 0 }}>הוספת אתר</h2>
             <form onSubmit={addSite}>
               <div className="form-field">
-                <label className="label">כתובת אתר</label>
+                <label className="label" htmlFor="add-site-url">כתובת אתר</label>
                 <input
+                  id="add-site-url"
                   className="input"
                   required
                   autoFocus
+                  inputMode="url"
                   placeholder="example.com"
                   value={form.url}
                   onChange={(e) => setForm({ ...form, url: e.target.value })}
                 />
               </div>
               <div className="form-field">
-                <label className="label">תווית (אופציונלי)</label>
+                <label className="label" htmlFor="add-site-label">תווית (אופציונלי)</label>
                 <input
+                  id="add-site-label"
                   className="input"
                   placeholder="לדוגמה: אתר החברה"
                   value={form.label}

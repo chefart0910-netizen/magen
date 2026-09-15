@@ -10,6 +10,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
+import { useLang } from "../lib/LangContext";
 import { formatDate, IMPACT_LABELS, SCAN_TYPE_LABELS } from "../lib/format";
 import { SCORE_OPINION_LABELS } from "../lib/reviews";
 
@@ -259,6 +260,7 @@ function SecuritySection({ result }) {
 
 export default function ScanReport() {
   const { scanId } = useParams();
+  const { path } = useLang();
   const [scan, setScan] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
@@ -315,7 +317,7 @@ export default function ScanReport() {
     return (
       <div className="report-doc">
         <p className="rep-error">{error}</p>
-        <Link to="/dashboard">חזרה לרשימת האתרים</Link>
+        <Link to={path("/dashboard")}>חזרה לרשימת האתרים</Link>
       </div>
     );
   }
@@ -326,7 +328,7 @@ export default function ScanReport() {
     return (
       <div className="report-doc">
         <p className="rep-error">לבדיקה זו אין תוצאה שמורה - לא ניתן להפיק דוח.</p>
-        <Link to="/dashboard">חזרה לרשימת האתרים</Link>
+        <Link to={path("/dashboard")}>חזרה לרשימת האתרים</Link>
       </div>
     );
   }
@@ -343,7 +345,7 @@ export default function ScanReport() {
         <button className="btn btn-primary" onClick={() => window.print()}>
           שמירה כ-PDF / הדפסה
         </button>
-        <Link className="btn btn-secondary" to={`/sites/${scan.site_id}`}>
+        <Link className="btn btn-secondary" to={path(`/sites/${scan.site_id}`)}>
           חזרה לאתר
         </Link>
       </div>

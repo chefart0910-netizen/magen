@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Seo from "../components/Seo";
+import { useLang } from "../lib/LangContext";
 
 // MAGEN - הצהרת נגישות.
 // ==========================================================================================
@@ -11,6 +12,9 @@ const CONTACT_EMAIL = "pavelchervonchik@gmail.com";
 const LAST_UPDATED = "ספטמבר 2026";
 
 export default function AccessibilityStatement() {
+  // כל קישור פנימי עובר דרך path() כדי לא להפיל מבקר אנגלי חזרה לעברית.
+  const { path } = useLang();
+
   return (
     <div className="page">
       <Seo
@@ -69,7 +73,7 @@ export default function AccessibilityStatement() {
         </p>
 
         <p style={{ marginTop: 24 }}>
-          <Link to="/">חזרה לעמוד הראשי</Link>
+          <Link to={path("/")}>חזרה לעמוד הראשי</Link>
         </p>
       </div>
     </div>

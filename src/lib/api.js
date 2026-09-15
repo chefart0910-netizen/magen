@@ -1,7 +1,13 @@
 const BASE = "/api";
 
 function getToken() {
-  return localStorage.getItem("magen_token");
+  // localStorage זורק כשנתוני אתר חסומים (חלון פרטי בספארי, הגדרות נוקשות) - ואם זה
+  // קורה כאן, כל קריאה ל-API נופלת לפני שהיא נשלחת.
+  try {
+    return localStorage.getItem("magen_token");
+  } catch {
+    return null;
+  }
 }
 
 async function request(path, { method = "GET", body, auth = true } = {}) {
@@ -22,10 +28,19 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
   if (res.status === 401 && auth) {
     // טוקן לא תקין/שפג/מצביע על משתמש שלא קיים - ניקוי אוטומטי והפניה להתחברות
     // מונע מצב שבו המשתמש תקוע עם שגיאה מבלבלת בלי לדעת שצריך פשוט להתחבר מחדש.
-    localStorage.removeItem("magen_token");
-    localStorage.removeItem("magen_user");
-    if (location.pathname !== "/login" && location.pathname !== "/signup") {
-      location.href = "/login";
+    try {
+      localStorage.removeItem("magen_token");
+      localStorage.removeItem("magen_user");
+    } catch {
+      // אחסון חסום - ההפניה למטה עדיין נכונה.
+    }
+    // שמירת קידומת השפה. קודם הופנה תמיד ל-"/login" העברי, כך שכל פקיעת סשן של משתמש
+    // אנגלי החזירה אותו לעברית - וגם הבדיקה למטה לא הכירה "/en/login", ולכן משתמש
+    // שכבר עמד על מסך ההתחברות האנגלי נזרק ברענון מלא למסך העברי.
+    const prefix = location.pathname === "/en" || location.pathname.startsWith("/en/") ? "/en" : "";
+    const authPaths = [`${prefix}/login`, `${prefix}/signup`];
+    if (!authPaths.includes(location.pathname)) {
+      location.href = `${prefix}/login`;
     }
   }
 

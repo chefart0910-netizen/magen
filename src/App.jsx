@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./lib/AuthContext";
 import { LangProvider, useRootLanguageRedirect } from "./lib/LangContext";
 import Layout from "./components/Layout";
@@ -98,6 +98,13 @@ function routesFor(prefix, user) {
   ];
 }
 
+// ההפניה של "כתובת לא נמצאה", עם שמירת שפת הכתובת שממנה הגיע המבקר.
+function NotFoundRedirect({ user }) {
+  const { pathname } = useLocation();
+  const prefix = pathname === "/en" || pathname.startsWith("/en/") ? "/en" : "";
+  return <Navigate to={user ? `${prefix}/dashboard` : prefix || "/"} replace />;
+}
+
 function AppRoutes() {
   const { user } = useAuth();
   useRootLanguageRedirect();
@@ -107,8 +114,9 @@ function AppRoutes() {
       {routesFor("/en", user)}
       {routesFor("", user)}
       {/* כתובת לא מוכרת: מחזירים לשורש ולא למסך התחברות, כדי שמבקר חדש שהקליק על
-          קישור שבור יראה מה המוצר עושה במקום טופס. */}
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
+          קישור שבור יראה מה המוצר עושה במקום טופס. הקידומת נשמרת - אחרת כל שגיאת
+          הקלדה בצד האנגלי היתה זורקת את המבקר לעברית בלי דרך חזרה. */}
+      <Route path="*" element={<NotFoundRedirect user={user} />} />
     </Routes>
   );
 }

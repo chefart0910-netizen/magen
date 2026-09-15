@@ -38,7 +38,17 @@ function applyPrefs(prefs) {
   }
 }
 
+// הווידג'ט מוצג גם בעמודים שאינם בתוך LangProvider, ולכן הקידומת נגזרת מהכתובת
+// ישירות ולא מ-useLang() - קריאה להוק שם היתה זורקת. הקישור היה "/accessibility" קבוע,
+// כלומר יציאה מהאנגלית בלחיצה אחת, וגם רענון מלא של העמוד במקום ניווט פנימי.
+function statementPath() {
+  if (typeof location === "undefined") return "/accessibility";
+  const p = location.pathname;
+  return (p === "/en" || p.startsWith("/en/") ? "/en" : "") + "/accessibility";
+}
+
 export default function AccessibilityWidget() {
+  const statementHref = statementPath();
   const [open, setOpen] = useState(false);
   const [prefs, setPrefs] = useState(loadPrefs);
   const buttonRef = useRef(null);
@@ -173,7 +183,7 @@ export default function AccessibilityWidget() {
             איפוס הגדרות
           </button>
 
-          <a className="a11y-statement-link" href="/accessibility">
+          <a className="a11y-statement-link" href={statementHref}>
             הצהרת הנגישות שלנו
           </a>
         </div>

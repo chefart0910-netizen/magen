@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
+import { useLang } from "../lib/LangContext";
 import ExpertReview from "../components/ExpertReview";
 import VerifyOwnership from "../components/VerifyOwnership";
 import ExpertAccess from "../components/ExpertAccess";
@@ -169,7 +170,7 @@ function SecurityResultCard({ result }) {
 function ReportLink({ scanId }) {
   if (!scanId) return null;
   return (
-    <a className="btn btn-secondary btn-sm" href={`/report/${scanId}`} target="_blank" rel="noreferrer">
+    <a className="btn btn-secondary btn-sm" href={path(`/report/${scanId}`)} target="_blank" rel="noreferrer">
       דוח ללקוח (PDF)
     </a>
   );
@@ -229,6 +230,7 @@ function ScanResultCard({ scan }) {
 export default function SiteDetail() {
   const { siteId } = useParams();
   const { user } = useAuth();
+  const { path } = useLang();
   const [site, setSite] = useState(null);
   const [scans, setScans] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -237,15 +239,31 @@ export default function SiteDetail() {
   const [running, setRunning] = useState(null); // key of the running action
   // מתי התחילה הסריקה האסינכרונית שרצה כרגע, אם יש כזו. מזין את ScanProgress.
   const [scanStartedAt, setScanStartedAt] = useState(null);
+  // האם הרשומה נטענה בכלל. בלי זה "האתר לא נמצא" היה בלתי ניתן להצגה: site נשאר null,
+  // error נשאר ריק, והמסך הציג "טוען..." לנצח - וזה מה שקורה לכל קישור ישן לאתר שנמחק.
+  const [loaded, setLoaded] = useState(false);
+
+  // המתנה לסריקה היא לולאה של עד 12 דקות. בלי דגל חיות היא ממשיכה לרוץ אחרי שהמשתמש
+  // עבר לאתר אחר - שולחת בקשות על ה-siteId הקודם וכותבת state לעץ שכבר לא קיים.
+  const aliveRef = useRef(true);
+  useEffect(() => {
+    aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+    };
+  }, [siteId]);
 
   const load = useCallback(async () => {
     try {
       const [sitesData, scansData] = await Promise.all([api.listSites(), api.listScans(siteId)]);
       const found = sitesData.sites.find((s) => s.id === siteId);
+      if (!aliveRef.current) return;
       setSite(found || null);
       setScans(scansData.scans);
     } catch (err) {
-      setError(err.message);
+      if (aliveRef.current) setError(err.message);
+    } finally {
+      if (aliveRef.current) setLoaded(true);
     }
   }, [siteId]);
 
@@ -272,12 +290,13 @@ export default function SiteDetail() {
     const deadline = Date.now() + 12 * 60 * 1000;
     let attempt = 0;
 
-    while (Date.now() < deadline) {
+    while (Date.now() < deadline && aliveRef.current) {
       // האטה הדרגתית: 5 שניות בהתחלה ועד 15 שניות. בקצב הקודם (6 שניות קבוע) סריקה
       // אחת ייצרה יותר מ-60 בקשות לשרת, וזה מיותר בתהליך שאורכו דקות.
       const delay = Math.min(15000, 5000 + Math.floor(attempt / 3) * 2500);
       attempt += 1;
       await new Promise((r) => setTimeout(r, delay));
+      if (!aliveRef.current) return;
 
       let data;
       try {
@@ -285,6 +304,7 @@ export default function SiteDetail() {
       } catch (err) {
         continue; // תקלת רשת רגעית לא צריכה להפיל את ההמתנה
       }
+      if (!aliveRef.current) return;
       setScans(data.scans);
       const scan = data.scans.find((s) => s.id === scanId);
       if (!scan || scan.status === "running" || scan.status === "queued") continue;
@@ -297,6 +317,7 @@ export default function SiteDetail() {
       }
       return;
     }
+    if (!aliveRef.current) return;
     // לא כשל: הסריקה ממשיכה על ה-runner גם אחרי שהפסקנו לשאול.
     setNotice(
       "הבדיקה ממשיכה לרוץ ברקע. אפשר לעזוב את הדף — התוצאה תופיע בהיסטוריית הבדיקות כשתהיה מוכנה."
@@ -338,12 +359,12 @@ export default function SiteDetail() {
     }
   };
 
-  if (!site && !error) return <div className="text-dim">טוען...</div>;
+  if (!loaded && !error) return <div className="text-dim">טוען...</div>;
   if (!site) {
     return (
       <div className="card empty-state">
         <div>האתר לא נמצא</div>
-        <Link className="btn btn-secondary" style={{ marginTop: 12 }} to="/dashboard">
+        <Link className="btn btn-secondary" style={{ marginTop: 12 }} to={path("/dashboard")}>
           חזרה לרשימת האתרים
         </Link>
       </div>
@@ -353,7 +374,7 @@ export default function SiteDetail() {
   return (
     <>
       <div className="breadcrumb">
-        <Link to="/dashboard">האתרים שלי</Link> / {site.url}
+        <Link to={path("/dashboard")}>האתרים שלי</Link> / {site.url}
       </div>
 
       <div className="page-header">
@@ -422,10 +443,24 @@ export default function SiteDetail() {
       {scanStartedAt && <ScanProgress startedAt={scanStartedAt} />}
 
       {selected && <ScanResultCard scan={selected} />}
+      {/* key לפי מזהה הסריקה. בלעדיו React שומר את אותו מופע כשפותחים סריקה אחרת
+          מההיסטוריה, ואז הפאנלים מציגים את המצב של הסריקה הקודמת: כתובת הפרסום של
+          סריקה א' מוצגת כאילו היא של סריקה ב', וטיוטת חוות דעת עוברת בין סריקות. */}
       {selected?.id && (
-        <SharePublic siteId={siteId} scan={selected} verified={!!site.ownership_verified} />
+        <SharePublic
+          key={`share-${selected.id}`}
+          siteId={siteId}
+          scan={selected}
+          verified={!!site.ownership_verified}
+        />
       )}
-      {selected?.id && <ExpertReview scanId={selected.id} scanStatus={selected.status} />}
+      {selected?.id && (
+        <ExpertReview
+          key={`review-${selected.id}`}
+          scanId={selected.id}
+          scanStatus={selected.status}
+        />
+      )}
 
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ marginTop: 0, fontSize: 16 }}>היסטוריית בדיקות</h2>

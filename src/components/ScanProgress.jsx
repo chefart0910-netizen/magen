@@ -37,15 +37,20 @@ export default function ScanProgress({ startedAt, label }) {
   // מעל 4 דקות זה עדיין תקין, אבל צריך לומר את זה - אחרת ההמתנה נקראת ככשל.
   const heavy = elapsed >= 240;
 
+  // aria-live היה על כל הכרטיס, שמכיל טיימר שמתעדכן כל שנייה - כלומר קורא מסך הכריז
+  // מחדש את כל הפאנל פעם בשנייה, במשך דקות. זה גרוע יותר מאי-הכרזה בכלל. עכשיו רק שם
+  // השלב מוכרז, והטיימר מוסתר מקוראי מסך.
   return (
-    <div className="card sp" role="status" aria-live="polite">
+    <div className="card sp" role="group" aria-label={label || "הבדיקה רצה"}>
       <div className="sp-head">
         <span className="spinner" />
         <div>
           <div className="sp-title">{label || "הבדיקה רצה"}</div>
-          <div className="sp-stage">{stage.text}</div>
+          <div className="sp-stage" role="status" aria-live="polite">
+            {stage.text}
+          </div>
         </div>
-        <div className="sp-timer" aria-label="זמן שעבר">
+        <div className="sp-timer" aria-hidden="true">
           {fmt(elapsed)}
         </div>
       </div>

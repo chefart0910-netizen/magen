@@ -415,15 +415,40 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="tabs">
-        {TABS.map((t) => (
-          <div key={t.key} className={`tab ${tab === t.key ? "active" : ""}`} onClick={() => setTab(t.key)}>
+      {/* היו כאן div-ים עם onClick בלבד: חמישה מששת מסכי הבק-אופיס היו בלתי נגישים
+          למשתמש מקלדת או לקורא מסך, שנשאר נעוץ בלשונית הראשונה. כפתורים עם סמנטיקת
+          tablist, כולל ניווט בחצים. */}
+      <div className="tabs" role="tablist" aria-label="מסכי הבק-אופיס">
+        {TABS.map((t, index) => (
+          <button
+            key={t.key}
+            type="button"
+            role="tab"
+            id={`admin-tab-${t.key}`}
+            aria-selected={tab === t.key}
+            aria-controls="admin-tabpanel"
+            tabIndex={tab === t.key ? 0 : -1}
+            className={`tab ${tab === t.key ? "active" : ""}`}
+            onClick={() => setTab(t.key)}
+            onKeyDown={(e) => {
+              if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+              e.preventDefault();
+              // הממשק בעברית (RTL): חץ ימינה הוא "אחורה" ויזואלית, ולכן הכיוונים הפוכים
+              // מהמקובל בממשק LTR.
+              const step = e.key === "ArrowLeft" ? 1 : -1;
+              const next = (index + step + TABS.length) % TABS.length;
+              setTab(TABS[next].key);
+              document.getElementById(`admin-tab-${TABS[next].key}`)?.focus();
+            }}
+          >
             {t.label}
-          </div>
+          </button>
         ))}
       </div>
 
-      <Active />
+      <div id="admin-tabpanel" role="tabpanel" aria-labelledby={`admin-tab-${tab}`}>
+        <Active />
+      </div>
     </>
   );
 }
