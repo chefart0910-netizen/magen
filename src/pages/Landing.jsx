@@ -13,6 +13,35 @@ import { api } from "../lib/api";
 // מבקר שיש לו סיבה להירשם. התוצאה כאן חלקית - שלושה ממצאים בכותרת בלבד (ראו routes/public.js).
 // כל הטקסטים מגיעים מ-lib/i18n.js, בעברית ובאנגלית.
 
+// כרטיס תקנה 35(ה). מוצג בנפרד משאר הממצאים בכוונה: זו התשובה היחידה כאן שהיא הכרעה
+// בינארית לשאלה משפטית קונקרטית, ולא הערכה מקצועית. מבקר מבין ממנו תוך שלוש שניות
+// אם יש לו בעיה או לא.
+function StatementCard({ L, statement }) {
+  const ok = statement.status === "statement_contact";
+  const messages = {
+    statement_contact: L.stmtOk,
+    statement: L.stmtNoContact,
+    link_only: L.stmtBroken,
+    none: L.stmtNone,
+    unreachable: null,
+  };
+  const message = messages[statement.status];
+  if (!message) return null;
+
+  return (
+    <div className={`lp-stmt ${ok ? "lp-stmt-ok" : "lp-stmt-bad"}`}>
+      <h2 className="lp-result-sub">{L.stmtTitle}</h2>
+      <p className="lp-stmt-msg">
+        <span aria-hidden="true">{ok ? "\u2713" : "\u2717"}</span> {message}
+      </p>
+      {!ok && <p className="lp-stmt-why">{L.stmtWhy}</p>}
+      {statement.overlay_detected && (
+        <p className="lp-stmt-why">{L.stmtOverlay(statement.overlay_detected)}</p>
+      )}
+    </div>
+  );
+}
+
 export default function Landing() {
   const { t, path, lang } = useLang();
   const L = t.landing;
@@ -130,6 +159,10 @@ export default function Landing() {
                 </div>
               ))}
             </div>
+
+            {result.accessibility_statement && (
+              <StatementCard L={L} statement={result.accessibility_statement} />
+            )}
 
             {result.preview?.length > 0 ? (
               <>

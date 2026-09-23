@@ -102,6 +102,48 @@ function SecurityFindings({ findings }) {
   );
 }
 
+// תקנה 35(ה) - הצהרת נגישות. מוצגת ככרטיס נפרד ולא כשורה בטבלה כי היא שונה במהותה
+// משאר מה שכאן: כל השאר הוא הערכה מקצועית, וזו תשובה חד-משמעית לשאלה שנתבעים עליה.
+function StatementPanel({ statement }) {
+  if (!statement || statement.status === "unreachable") return null;
+
+  const ok = statement.status === "statement_contact";
+  const text = {
+    statement_contact: "נמצאה הצהרת נגישות עם פרטי התקשרות.",
+    statement: 'נמצאה הצהרת נגישות, אך בלי דוא"ל או טלפון. תקנה 35(ה) דורשת את פרטי ההתקשרות עם רכז הנגישות.',
+    link_only: "יש קישור להצהרת נגישות, אבל העמוד שמאחוריו אינו נטען או אינו מכיל הצהרה.",
+    none: "לא נמצאה הצהרת נגישות באתר.",
+  }[statement.status];
+
+  return (
+    <div className={`lp-stmt ${ok ? "lp-stmt-ok" : "lp-stmt-bad"}`} style={{ marginTop: 12 }}>
+      <h3 className="lp-result-sub">הצהרת נגישות (תקנה 35(ה))</h3>
+      <p className="lp-stmt-msg">
+        <span aria-hidden="true">{ok ? "\u2713" : "\u2717"}</span> {text}
+      </p>
+      {statement.url && (
+        <p className="lp-stmt-why">
+          העמוד שנבדק:{" "}
+          <a href={statement.url} target="_blank" rel="noreferrer" dir="ltr">
+            {statement.url}
+          </a>
+        </p>
+      )}
+      {!ok && (
+        <p className="lp-stmt-why">
+          זו ההפרה שעליה הוגשו בפועל רוב התביעות בישראל - לא נגישות לקויה, אלא הצהרה חסרה.
+        </p>
+      )}
+      {statement.overlay_detected && (
+        <p className="lp-stmt-why">
+          זוהה ווידג'ט נגישות ({statement.overlay_detected}). ווידג'ט אינו מחליף הצהרה ואינו
+          הופך אתר לנגיש.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function SecurityResultCard({ result }) {
   const cert = result.certificate;
   const badCookies = (result.cookies || []).filter((c) => c.issues.length > 0).length;
@@ -159,6 +201,8 @@ function SecurityResultCard({ result }) {
       {result.zap_error && (
         <div className="error-banner">סריקת ZAP הנוספת נכשלה: {result.zap_error}</div>
       )}
+
+      <StatementPanel statement={result.accessibility_statement} />
 
       <SecurityFindings findings={result.findings} />
     </div>

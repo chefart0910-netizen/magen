@@ -1,0 +1,65 @@
+# MAGEN - הרצת מחקר השוק.
+# ==========================================================================================
+# למה על runner ולא בתוך הפונקציה ב-Vercel: הסקר מבקש כמה מאות עמודים לאורך כמה דקות.
+# לפונקציה יש תקרה של 60 שניות, ואין שום סיבה להעמיס עליה עבודה שאינה בקשת משתמש.
+# זו בדיוק התשתית שכבר מריצה את הסריקות (scan.yml).
+#
+# הרצה ידנית בלבד (workflow_dispatch) - זה מחקר, לא תהליך שרץ מעצמו.
+#
+# אין npm install: הסקריפט משתמש רק ב-fetch המובנה של Node ובשני מודולים מהריפו.
+# התוצאה נשמרת כ-artifact של הריצה.
+
+name: market study
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "כמה אתרים לבדוק (0 = הכל)"
+        required: false
+        default: "0"
+      concurrency:
+        description: "כמה במקביל (נמוך בכוונה)"
+        required: false
+        default: "4"
+
+jobs:
+  study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # שער לפני הריצה האמיתית: הגלאי נבדק מול תשובות מבוימות. אין טעם לשרוף 40 דקות
+      # ולגלות בסוף שהלוגיקה שבורה - ובעיקר, אין טעם לייצר מספר שגוי בדוח.
+      - name: בדיקה עצמית של הגלאי
+        run: node scripts/market-study/self-test.js
+
+      - name: הרצת הסקר
+        env:
+          STUDY_LIMIT: ${{ inputs.limit }}
+          STUDY_CONCURRENCY: ${{ inputs.concurrency }}
+          STUDY_DELAY_MS: "400"
+        run: node scripts/market-study/run.js
+
+      - name: סיכום לעמוד הריצה
+        if: always()
+        run: |
+          latest=$(ls -1 scripts/market-study/out/summary-*.md 2>/dev/null | tail -1)
+          if [ -n "$latest" ]; then
+            cat "$latest" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "לא נוצר סיכום - ראו את הלוג של השלב הקודם." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: שמירת התוצאות
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-study
+          path: scripts/market-study/out/
+          retention-days: 90

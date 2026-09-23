@@ -64,6 +64,17 @@ const he = {
     loadingNote: "בודקים כותרות אבטחה, תעודת TLS, עוגיות ותוכן מעורב. זה לוקח כמה שניות.",
     scoreLabel: "ציון אבטחה",
     findingsTitle: "הממצאים הבולטים",
+    // תקנה 35(ה) - ראו lib/services/accessibility-statement.js. זו הבדיקה היחידה במוצר
+    // שנותנת תשובה חד-משמעית לשאלה משפטית, ולכן היא מוצגת ככרטיס נפרד ולא כעוד ממצא.
+    stmtTitle: "הצהרת נגישות (תקנה 35(ה))",
+    stmtOk: "נמצאה הצהרת נגישות עם פרטי התקשרות.",
+    stmtNoContact: "נמצאה הצהרת נגישות, אך בלי דוא\"ל או טלפון ליצירת קשר. התקנה דורשת את פרטי ההתקשרות עם רכז הנגישות.",
+    stmtBroken: "יש קישור להצהרת נגישות, אבל העמוד שמאחוריו אינו נטען או אינו מכיל הצהרה.",
+    stmtNone: "לא נמצאה הצהרת נגישות באתר.",
+    stmtWhy:
+      "זו ההפרה שעליה הוגשו בפועל רוב התביעות בישראל - לא נגישות לקויה, אלא הצהרה חסרה. בינואר 2024 נדחו בבית המשפט המחוזי בת\"א שש בקשות אישור מהסוג הזה נגד עסקים קטנים.",
+    stmtOverlay: (vendor) =>
+      `זוהה ווידג'ט נגישות (${vendor}). ווידג'ט אינו מחליף הצהרת נגישות ואינו הופך אתר לנגיש - ה-FTC קנס את accessiBe במיליון דולר בינואר 2025 על הצגתו כמביא לעמידה בתקן.`,
     clean: "לא נמצאו ממצאי אבטחה פסיביים באתר הזה. זה מצב טוב - ונבדק כאן רק חלק אחד מהתמונה.",
     lockedMore: (n) => `נותרו עוד ${n} ממצאים, וההסבר מה לעשות עם כל אחד מהם.`,
     lockedNone: "הדוח המלא כולל גם נגישות לפי תקן ישראלי 5568, ביצועים ו-SEO.",
@@ -182,6 +193,17 @@ const en = {
     loadingNote: "Checking security headers, the TLS certificate, cookies and mixed content. Takes a few seconds.",
     scoreLabel: "Security score",
     findingsTitle: "Top findings",
+    // Israeli Regulation 35(e). Kept in English too because the EU/US visitor needs to
+    // understand what this check is before the Israeli framing means anything to them.
+    stmtTitle: "Accessibility statement",
+    stmtOk: "An accessibility statement with contact details was found.",
+    stmtNoContact: "An accessibility statement was found, but with no email or phone. The regulation requires contact details for the accessibility coordinator.",
+    stmtBroken: "There is a link to an accessibility statement, but the page behind it does not load or contains no statement.",
+    stmtNone: "No accessibility statement was found on this site.",
+    stmtWhy:
+      "In Israel this specific omission — not poor accessibility — is what most accessibility claims were actually filed over. Under the EU Accessibility Act, an accessibility statement is likewise expected of obligated businesses.",
+    stmtOverlay: (vendor) =>
+      `An accessibility overlay was detected (${vendor}). An overlay is not a substitute for a statement and does not make a site accessible — the FTC fined accessiBe $1,000,000 in January 2025 for marketing one as achieving WCAG compliance.`,
     clean: "No passive security findings on this site. That's a good sign — and only one part of the picture was checked here.",
     lockedMore: (n) => `${n} more findings remain, along with what to do about each one.`,
     lockedNone: "The full report also covers accessibility, performance and technical SEO.",

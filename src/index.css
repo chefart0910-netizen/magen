@@ -1705,3 +1705,39 @@ body.report-mode {
 .sp-heavy {
   margin-top: 14px;
 }
+
+/* תקנה 35(ה) - כרטיס הצהרת הנגישות בעמוד הבית ובדוח.
+   מודגש ויזואלית משאר הממצאים כי הוא אומר דבר אחר: לא "כדאי לשפר" אלא "יש כאן דרישה
+   בתקנות, והיא מתקיימת או לא". הצבע נגזר מהמצב ולא מעוצמת הממצא. */
+.lp-stmt {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-inline-start-width: 4px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.lp-stmt-ok {
+  border-inline-start-color: var(--success);
+}
+
+.lp-stmt-bad {
+  border-inline-start-color: var(--warning);
+}
+
+.lp-stmt .lp-result-sub {
+  margin-top: 0;
+}
+
+.lp-stmt-msg {
+  margin: 6px 0 0;
+  font-size: 15px;
+}
+
+.lp-stmt-why {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
