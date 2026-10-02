@@ -60,6 +60,14 @@ export const api = {
 
   register: (payload) => request("/auth/register", { method: "POST", body: payload, auth: false }),
   login: (payload) => request("/auth/login", { method: "POST", body: payload, auth: false }),
+  // שכחתי סיסמה. האסימון מגיע מה-hash של הכתובת ונשלח בגוף הבקשה בלבד.
+  resetAvailable: () => request("/auth/reset-available", { auth: false }),
+  forgotPassword: (email, lang) =>
+    request("/auth/forgot-password", { method: "POST", body: { email, lang }, auth: false }),
+  checkResetToken: (token) =>
+    request("/auth/reset-password/check", { method: "POST", body: { token }, auth: false }),
+  resetPassword: (token, password) =>
+    request("/auth/reset-password", { method: "POST", body: { token, password }, auth: false }),
 
   listSites: () => request("/sites"),
   addSite: (payload) => request("/sites", { method: "POST", body: payload }),
@@ -101,6 +109,7 @@ export const api = {
     request(`/admin/reviews/${reviewId}`, { method: "PATCH", body: { action } }),
   adminSetExpert: (userId, is_expert) =>
     request(`/admin/users/${userId}/expert`, { method: "PATCH", body: { is_expert } }),
+  adminResetLink: (userId) => request(`/admin/users/${userId}/reset-link`, { method: "POST" }),
   adminSites: () => request("/admin/sites"),
   adminScans: () => request("/admin/scans"),
   adminAuditLog: () => request("/admin/audit-log"),

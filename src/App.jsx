@@ -5,6 +5,8 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import SiteDetail from "./pages/SiteDetail";
 import Admin from "./pages/Admin";
@@ -34,6 +36,14 @@ function routesFor(prefix, user) {
       path={p("/signup")}
       element={user ? <Navigate to={to("/dashboard")} replace /> : <Signup />}
     />,
+    <Route
+      key={`${prefix}-forgot`}
+      path={p("/forgot-password")}
+      element={user ? <Navigate to={to("/dashboard")} replace /> : <ForgotPassword />}
+    />,
+    // בלי הפניה למשתמש מחובר: מי שפותח קישור איפוס צריך להגיע לטופס גם אם הדפדפן הזה
+    // מחובר (למשל לחשבון אחר, או כשמישהו אחר נכנס בשמו - בדיוק המקרה שהאיפוס פותר).
+    <Route key={`${prefix}-reset`} path={p("/reset-password")} element={<ResetPassword />} />,
 
     <Route
       key={`${prefix}-dashboard`}

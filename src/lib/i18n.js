@@ -119,7 +119,35 @@ const he = {
     submitting: "מתחבר...",
     noAccount: "עדיין אין לך חשבון?",
     signupLink: "הרשם עכשיו",
+    forgot: "שכחתי סיסמה",
     seoDesc: "התחברו לחשבון MAGEN כדי לסרוק את האתר שלכם ולצפות בדוחות ביצועים, נגישות, SEO ואבטחה.",
+  },
+
+  forgot: {
+    title: "שכחתי סיסמה",
+    sub: "הזינו את כתובת האימייל של החשבון, ונשלח אליה קישור לבחירת סיסמה חדשה.",
+    email: "אימייל",
+    submit: "שלחו לי קישור",
+    submitting: "שולח...",
+    sent: "אם הכתובת רשומה במערכת, נשלח אליה קישור לאיפוס הסיסמה. הקישור בתוקף לשעה ולשימוש חד-פעמי. לא הגיע? בדקו בתיקיית הספאם.",
+    backToLogin: "חזרה להתחברות",
+    manual: "איפוס אוטומטי במייל עדיין לא זמין. כתבו לנו מהכתובת הרשומה בחשבון, ונשלח אליה קישור לבחירת סיסמה חדשה:",
+    manualSubject: "איפוס סיסמה ל-MAGEN",
+  },
+
+  reset: {
+    title: "בחירת סיסמה חדשה",
+    sub: "אחרי השמירה, כל המכשירים שמחוברים לחשבון יתנתקו.",
+    checking: "בודק את הקישור...",
+    invalid: "הקישור אינו תקף - ייתכן שפג תוקפו (שעה), שכבר נעשה בו שימוש, או שנשלח אחריו קישור חדש יותר.",
+    requestNew: "בקשו קישור חדש",
+    password: "סיסמה חדשה (8 תווים לפחות)",
+    confirm: "אימות הסיסמה",
+    mismatch: "הסיסמאות אינן זהות",
+    submit: "שמירת הסיסמה",
+    submitting: "שומר...",
+    done: "הסיסמה עודכנה, וכל הסשנים הקודמים נסגרו. אפשר להתחבר עם הסיסמה החדשה.",
+    toLogin: "להתחברות",
   },
 
   signup: {
@@ -251,7 +279,35 @@ const en = {
     submitting: "Logging in...",
     noAccount: "Don't have an account yet?",
     signupLink: "Sign up",
+    forgot: "Forgot password?",
     seoDesc: "Log in to MAGEN to scan your website and view performance, accessibility, SEO and security reports.",
+  },
+
+  forgot: {
+    title: "Forgot password",
+    sub: "Enter your account email and we'll send you a link to choose a new password.",
+    email: "Email",
+    submit: "Send me a link",
+    submitting: "Sending...",
+    sent: "If that address is registered, a reset link is on its way. It's valid for one hour and works once. Not there? Check your spam folder.",
+    backToLogin: "Back to log in",
+    manual: "Automatic email reset isn't available yet. Write to us from the address registered on your account and we'll reply with a link to choose a new password:",
+    manualSubject: "MAGEN password reset",
+  },
+
+  reset: {
+    title: "Choose a new password",
+    sub: "Once saved, every device signed in to this account will be signed out.",
+    checking: "Checking the link...",
+    invalid: "This link isn't valid - it may have expired (one hour), already been used, or been replaced by a newer one.",
+    requestNew: "Request a new link",
+    password: "New password (at least 8 characters)",
+    confirm: "Confirm password",
+    mismatch: "The passwords don't match",
+    submit: "Save password",
+    submitting: "Saving...",
+    done: "Your password was updated and all previous sessions were signed out. You can log in with the new password.",
+    toLogin: "Go to log in",
   },
 
   signup: {

@@ -64,6 +64,8 @@ function UsersTab() {
   const [users, setUsers] = useState(null);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState(null);
+  // קישור איפוס שהופק עכשיו. מוצג פעם אחת ונעלם ברענון - השרת לא שומר אותו.
+  const [resetInfo, setResetInfo] = useState(null);
 
   const load = () => api.adminUsers().then((d) => setUsers(d.users)).catch((e) => setError(e.message));
 
@@ -79,6 +81,21 @@ function UsersTab() {
     try {
       await api.adminSetExpert(id, next);
       await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  // הגשר עד שיש מייל: אדמין מפיק קישור ומעביר אותו למשתמש בערוץ שבו הוא פנה.
+  // לפני שמעבירים - לוודא שהפונה הוא באמת בעל הכתובת (למשל שיענה מהמייל הזה).
+  const issueResetLink = async (u) => {
+    if (!window.confirm(`להפיק קישור איפוס סיסמה עבור ${u.email}?\nהעבירו אותו רק אחרי שווידאתם שהפונה הוא בעל החשבון.`)) return;
+    setBusyId(u.id);
+    setError("");
+    try {
+      setResetInfo(await api.adminResetLink(u.id));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -104,6 +121,35 @@ function UsersTab() {
 
   return (
     <div className="card">
+      {resetInfo && (
+        <div className="success-banner" role="status" style={{ marginBottom: 12 }}>
+          <div>
+            קישור איפוס עבור <strong>{resetInfo.email}</strong> — חד-פעמי, בתוקף {resetInfo.expires_in_minutes} דקות.
+            הוא לא יוצג שוב.
+          </div>
+          <input
+            className="input"
+            dir="ltr"
+            readOnly
+            value={resetInfo.link}
+            onFocus={(e) => e.target.select()}
+            style={{ marginTop: 6, fontSize: 12 }}
+            aria-label="קישור איפוס"
+          />
+          <div style={{ marginTop: 6, display: "flex", gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => navigator.clipboard?.writeText(resetInfo.link).catch(() => {})}
+            >
+              העתקה
+            </button>
+            <button type="button" className="btn btn-sm" onClick={() => setResetInfo(null)}>
+              סגירה
+            </button>
+          </div>
+        </div>
+      )}
       <table className="table">
         <thead>
           <tr>
@@ -114,6 +160,7 @@ function UsersTab() {
             <th>אדמין</th>
             <th>מומחה</th>
             <th>חבילה</th>
+            <th>סיסמה</th>
             <th>נרשם</th>
           </tr>
         </thead>
@@ -181,6 +228,16 @@ function UsersTab() {
                     </option>
                   ))}
                 </select>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  disabled={busyId === u.id}
+                  onClick={() => issueResetLink(u)}
+                >
+                  קישור איפוס
+                </button>
               </td>
               <td className="text-dim">{formatDate(u.created_at)}</td>
             </tr>

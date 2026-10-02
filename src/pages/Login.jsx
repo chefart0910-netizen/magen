@@ -72,6 +72,9 @@ export default function Login() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
+            <div style={{ marginTop: 6, fontSize: 13 }}>
+              <Link to={path("/forgot-password")}>{L.forgot}</Link>
+            </div>
           </div>
           <button className="btn btn-primary btn-block" disabled={loading}>
             {loading ? L.submitting : L.submit}
