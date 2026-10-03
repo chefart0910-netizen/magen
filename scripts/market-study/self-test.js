@@ -146,6 +146,43 @@ test("קישור מוחלט לדומיין אחר נבדק ולא מפיל", asy
   assert(r.status === "statement_contact", `קיבלנו ${r.status}`);
 });
 
+// --- מקרים שנוספו אחרי false negative אמיתי (chef-art.net, 2026-10-03) -----------------
+// ההצהרה שם כתובה ברוסית, הטלפון בחלוקה "058-79-362-59", והמייל מוסתר על ידי Cloudflare.
+// שלושתם יחד גרמו לגלאי לומר "בלי פרטי קשר" על הצהרה שיש בה גם טלפון וגם מייל.
+const cfEncode = (e, k = 0x5a) =>
+  k.toString(16).padStart(2, "0") + [...e].map((c) => (c.charCodeAt(0) ^ k).toString(16).padStart(2, "0")).join("");
+const RU_BODY = (contact) => `<html><body><h1>Декларация доступности</h1>
+<p>${"Сайт адаптирован для людей с ограниченными возможностями согласно израильскому стандарту 5568. ".repeat(8)}</p>
+${contact}</body></html>`;
+
+test("הצהרה ברוסית + טלפון בחלוקה לא שגרתית -> statement_contact", async () => {
+  pages.clear();
+  page("https://ru.co.il/", { html: '<a href="/decl">Декларация доступности</a>' });
+  page("https://ru.co.il/decl", { html: RU_BODY("<li>Телефон: 058-79-362-59</li>") });
+  const r = await checkAccessibilityStatement("https://ru.co.il/");
+  assert(r.status === "statement_contact", `קיבלנו ${r.status}`);
+  assert(r.details.contact_kinds.includes("phone"), "הטלפון לא זוהה");
+});
+
+test("מייל מוסתר על ידי Cloudflare -> מזוהה כמייל", async () => {
+  pages.clear();
+  page("https://cf.co.il/", { html: '<a href="/decl">Декларация доступности</a>' });
+  page("https://cf.co.il/decl", {
+    html: RU_BODY(`<li>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="${cfEncode("a@b.co.il")}">[email&#160;protected]</a></li>`),
+  });
+  const r = await checkAccessibilityStatement("https://cf.co.il/");
+  assert(r.status === "statement_contact", `קיבלנו ${r.status}`);
+  assert(r.details.contact_kinds.includes("email"), "המייל המוסתר לא זוהה");
+});
+
+test("תאריך בפורמט 05/11/2024 אינו נספר כטלפון", async () => {
+  pages.clear();
+  page("https://d.co.il/", { html: '<a href="/decl">Декларация доступности</a>' });
+  page("https://d.co.il/decl", { html: RU_BODY("<p>Дата обновления: 05/11/2024, 2026-10-03</p>") });
+  const r = await checkAccessibilityStatement("https://d.co.il/");
+  assert(r.status === "statement", `קיבלנו ${r.status}`);
+});
+
 function assert(condition, message) {
   if (!condition) throw new Error(message || "assertion failed");
 }
