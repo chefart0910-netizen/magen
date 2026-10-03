@@ -212,6 +212,9 @@ function SecurityResultCard({ result }) {
 // דוח הלקוח נפתח בלשונית חדשה כדי שלא לאבד את מצב העמוד (הבדיקה שנבחרה, הודעות מצב),
 // ומשם המשתמש שומר אותו כ-PDF דרך הדפדפן.
 function ReportLink({ scanId }) {
+  // useLang כאן ולא מהקומפוננטה האב: בלי השורה הזו "path" לא היה מוגדר, וכל עמוד אתר
+  // שיש בו סריקה שהושלמה קרס למסך לבן (ReferenceError) - נתפס בבדיקה בדפדפן, 2026-10-03.
+  const { path } = useLang();
   if (!scanId) return null;
   return (
     <a className="btn btn-secondary btn-sm" href={path(`/report/${scanId}`)} target="_blank" rel="noreferrer">
