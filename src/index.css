@@ -1741,3 +1741,13 @@ body.report-mode {
   line-height: 1.6;
   color: var(--text-dim);
 }
+
+/* סרטון ההסבר בעמוד הבית */
+.lp-video-player {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  border: 1px solid var(--border, #26314f);
+  background: #0d1220;
+}

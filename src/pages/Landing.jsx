@@ -192,6 +192,27 @@ export default function Landing() {
         )}
       </section>
 
+      {/* סרטון הסבר - בעברית בלבד, כי כל הטקסט בו עברי. preload="none": קובץ של כ-3MB
+          לא נטען עד שמבקר לוחץ, כדי לא להאט את עמוד הבית. אין בו קול, וכל מה שמוצג בו
+          מופיע גם כטקסט בעמוד - לכן אין צורך בכתוביות, וזה נאמר במפורש מתחת לנגן. */}
+      {lang === "he" && (
+        <section className="lp-section lp-video">
+          <h2>MAGEN בדקה וחצי</h2>
+          <video
+            className="lp-video-player"
+            controls
+            playsInline
+            muted
+            preload="none"
+            poster="/magen-intro-poster.jpg"
+            aria-label="סרטון הסבר על MAGEN: ממצאי המחקר, הסריקה החינמית, הדוח ללקוח והכלים לבוני אתרים"
+          >
+            <source src="/magen-intro.mp4" type="video/mp4" />
+          </video>
+          <p className="lp-scan-note">הסרטון ללא קול. כל המידע שמוצג בו מופיע גם בטקסט בעמוד הזה.</p>
+        </section>
+      )}
+
       <section className="lp-section">
         <h2>{L.checksTitle}</h2>
         <div className="lp-grid">
