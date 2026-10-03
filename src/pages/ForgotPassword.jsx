@@ -12,7 +12,7 @@ import LanguageSwitcher from "../components/LanguageSwitcher";
 //
 // כל עוד שליחת מייל לא מוגדרת בשרת, העמוד לא מציג טופס שמבטיח מייל שלא יגיע - הוא מפנה
 // לפנייה ידנית מהכתובת הרשומה, והאדמין מפיק קישור מהבק-אופיס.
-const SUPPORT_EMAIL = "pavelchervonchik@gmail.com";
+const SUPPORT_EMAIL = "support@magenscan.com";
 
 export default function ForgotPassword() {
   const { t, lang, path } = useLang();
