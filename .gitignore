@@ -6,3 +6,7 @@ dist/
 
 _to_delete/
 Claude outputs/
+
+# תוצאות מחקר השוק: כוללות כתובות של אתרים שנבדקו. מתפרסם רק במצטבר - לא לריפו.
+scripts/market-study/out/
+MAGEN-handoff.md

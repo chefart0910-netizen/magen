@@ -69,9 +69,23 @@ async function safeCheck(url) {
   }
 }
 
+function roundRobin(list) {
+  const groups = new Map();
+  for (const d of list) {
+    if (!groups.has(d.category)) groups.set(d.category, []);
+    groups.get(d.category).push(d);
+  }
+  const queues = [...groups.values()];
+  const out = [];
+  while (queues.some((q) => q.length)) for (const q of queues) if (q.length) out.push(q.shift());
+  return out;
+}
+
 async function run() {
   const domains = JSON.parse(fs.readFileSync(DOMAINS_PATH, "utf8"));
-  const work = LIMIT ? domains.slice(0, LIMIT) : domains;
+  // טעימה (STUDY_LIMIT) נלקחת לסירוגין מכל הענפים, לא N הראשונים בקובץ - אחרת טעימה של
+  // 20 יוצאת כולה מספרות וקוסמטיקאיות, והמספר שלה לא אומר כלום על השאר.
+  const work = LIMIT ? roundRobin(domains).slice(0, LIMIT) : domains;
   console.log(`בודק ${work.length} אתרים, ${CONCURRENCY} במקביל...`);
 
   const results = [];
@@ -179,7 +193,7 @@ function renderMarkdown(s) {
   const lines = [];
   lines.push(`# מצב הנגישות של אתרי עסקים קטנים בישראל`);
   lines.push("");
-  lines.push(`מדגם: **${s.sampled}** אתרים ב-20 ענפים. נענו: **${s.reached}**. לא נענו: ${s.unreachable}.`);
+  lines.push(`מדגם: **${s.sampled}** אתרים ב-${Object.keys(s.by_category).length} ענפים. נענו: **${s.reached}**. לא נענו: ${s.unreachable}.`);
   lines.push(`נבדק ב-${s.generated_at.slice(0, 10)} באמצעות MAGEN. כל הבדיקות פסיביות.`);
   lines.push("");
   lines.push(`## הממצא המרכזי - תקנה 35(ה)`);
