@@ -40,6 +40,19 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/((?!api/).*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "magen-pi.vercel.app"
+        }
+      ],
+      "destination": "https://magenscan.com/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap-scans.xml",

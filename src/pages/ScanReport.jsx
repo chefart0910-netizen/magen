@@ -432,7 +432,7 @@ export default function ScanReport() {
           באותו רגע בלבד. בדיקה אוטומטית מזהה חלק מהליקויים בלבד: היא אינה תחליף לבדיקה ידנית,
           ואינה מהווה אישור עמידה בתקן נגישות (ת"י 5568) או בכל דרישה רגולטורית אחרת.
         </p>
-        <p className="rep-meta">הופק על ידי MAGEN · magen-pi.vercel.app</p>
+        <p className="rep-meta">הופק על ידי MAGEN · magenscan.com</p>
       </footer>
     </div>
   );

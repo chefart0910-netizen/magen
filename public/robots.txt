@@ -26,6 +26,6 @@ Disallow: /en/admin
 Disallow: /en/login
 Disallow: /api/
 
-Sitemap: https://magen-pi.vercel.app/sitemap.xml
+Sitemap: https://magenscan.com/sitemap.xml
 # מפה שנייה, דינמית: עמודי התוצאה שפורסמו (/s/...). נבנית מהמסד ב-lib/routes/public.js.
-Sitemap: https://magen-pi.vercel.app/sitemap-scans.xml
+Sitemap: https://magenscan.com/sitemap-scans.xml
