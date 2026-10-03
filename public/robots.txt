@@ -26,6 +26,6 @@ Disallow: /en/admin
 Disallow: /en/login
 Disallow: /api/
 
-Sitemap: https://magenscan.com/sitemap.xml
+Sitemap: https://www.magenscan.com/sitemap.xml
 # מפה שנייה, דינמית: עמודי התוצאה שפורסמו (/s/...). נבנית מהמסד ב-lib/routes/public.js.
-Sitemap: https://magenscan.com/sitemap-scans.xml
+Sitemap: https://www.magenscan.com/sitemap-scans.xml

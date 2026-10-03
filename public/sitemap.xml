@@ -8,55 +8,55 @@
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://magenscan.com/</loc>
-    <xhtml:link rel="alternate" hreflang="he" href="https://magenscan.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://magenscan.com/en"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://magenscan.com/"/>
+    <loc>https://www.magenscan.com/</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://www.magenscan.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.magenscan.com/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.magenscan.com/"/>
     <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://magenscan.com/en</loc>
-    <xhtml:link rel="alternate" hreflang="he" href="https://magenscan.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://magenscan.com/en"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://magenscan.com/"/>
+    <loc>https://www.magenscan.com/en</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://www.magenscan.com/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.magenscan.com/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.magenscan.com/"/>
     <lastmod>2026-09-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://magenscan.com/signup</loc>
-    <xhtml:link rel="alternate" hreflang="he" href="https://magenscan.com/signup"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://magenscan.com/en/signup"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://magenscan.com/signup"/>
+    <loc>https://www.magenscan.com/signup</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://www.magenscan.com/signup"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.magenscan.com/en/signup"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.magenscan.com/signup"/>
     <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://magenscan.com/en/signup</loc>
-    <xhtml:link rel="alternate" hreflang="he" href="https://magenscan.com/signup"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://magenscan.com/en/signup"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://magenscan.com/signup"/>
+    <loc>https://www.magenscan.com/en/signup</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://www.magenscan.com/signup"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.magenscan.com/en/signup"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.magenscan.com/signup"/>
     <lastmod>2026-09-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://magenscan.com/accessibility</loc>
-    <xhtml:link rel="alternate" hreflang="he" href="https://magenscan.com/accessibility"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://magenscan.com/en/accessibility"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://magenscan.com/accessibility"/>
+    <loc>https://www.magenscan.com/accessibility</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://www.magenscan.com/accessibility"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.magenscan.com/en/accessibility"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.magenscan.com/accessibility"/>
     <lastmod>2026-09-12</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://magenscan.com/en/accessibility</loc>
-    <xhtml:link rel="alternate" hreflang="he" href="https://magenscan.com/accessibility"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://magenscan.com/en/accessibility"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://magenscan.com/accessibility"/>
+    <loc>https://www.magenscan.com/en/accessibility</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="https://www.magenscan.com/accessibility"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.magenscan.com/en/accessibility"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.magenscan.com/accessibility"/>
     <lastmod>2026-09-12</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

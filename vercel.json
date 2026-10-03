@@ -49,7 +49,7 @@
           "value": "magen-pi.vercel.app"
         }
       ],
-      "destination": "https://magenscan.com/$1",
+      "destination": "https://www.magenscan.com/$1",
       "permanent": true
     }
   ],
