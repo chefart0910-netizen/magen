@@ -12,6 +12,7 @@ import SiteDetail from "./pages/SiteDetail";
 import Admin from "./pages/Admin";
 import AccessibilityStatement from "./pages/AccessibilityStatement";
 import ScanReport from "./pages/ScanReport";
+import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import PublicScan from "./pages/PublicScan";
 
@@ -74,6 +75,17 @@ function routesFor(prefix, user) {
         <ProtectedRoute requireAdmin>
           <Layout>
             <Admin />
+          </Layout>
+        </ProtectedRoute>
+      }
+    />,
+    <Route
+      key={`${prefix}-settings`}
+      path={p("/settings")}
+      element={
+        <ProtectedRoute>
+          <Layout>
+            <Settings />
           </Layout>
         </ProtectedRoute>
       }

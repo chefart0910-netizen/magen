@@ -15,6 +15,7 @@ const T = {
     beta: "בטא",
     mainNav: "ניווט ראשי",
     mySites: "האתרים שלי",
+    settings: "הגדרות התראות",
     backOffice: "בק-אופיס",
     logout: "התנתק",
     accessibility: "הצהרת נגישות",
@@ -24,6 +25,7 @@ const T = {
     beta: "Beta",
     mainNav: "Main navigation",
     mySites: "My sites",
+    settings: "Alert settings",
     backOffice: "Back office",
     logout: "Log out",
     accessibility: "Accessibility statement",
@@ -63,6 +65,9 @@ export default function Layout({ children }) {
           <div className="nav-links">
             <NavLink to={path("/dashboard")} className={({ isActive }) => (isActive ? "active" : "")}>
               {t.mySites}
+            </NavLink>
+            <NavLink to={path("/settings")} className={({ isActive }) => (isActive ? "active" : "")}>
+              {t.settings}
             </NavLink>
             {user.is_admin && (
               <NavLink to={path("/admin")} className={({ isActive }) => (isActive ? "active" : "")}>
