@@ -23,6 +23,8 @@ const scanCallbackRoutes = require("../lib/routes/scan-callback");
 const publicRoutes = require("../lib/routes/public");
 const grantsRoutes = require("../lib/routes/grants");
 const cronRoutes = require("../lib/routes/cron");
+const searchRoutes = require("../lib/routes/search");
+const accountRoutes = require("../lib/routes/account");
 
 const app = express();
 
@@ -67,6 +69,8 @@ app.use("/api/sites", scansRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/reviews", reviewsRoutes);
 app.use("/api/grants", grantsRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/account", accountRoutes);
 
 // ללא requireAuth בכוונה - הקורא הוא workflow מתוזמן, שמזדהה בסוד משותף (CRON_SECRET).
 app.use("/api/cron", cronRoutes);
