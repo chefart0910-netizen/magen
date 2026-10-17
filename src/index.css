@@ -5,21 +5,39 @@
      ההיסטורי של חותמת/מגן מתכת מחומצן - קירור, רשמי, לא "עוד אפליקציה". נבדק ביחסי ניגודיות
      בפועל: --link על רקע הכרטיס = 6.8:1, לבן על --primary-dark = 6.2:1. שניהם מעל ה-4.5
      הנדרש ב-WCAG AA לטקסט רגיל - לא רק מעל ה-3 שמספיק לרכיבי ממשק. */
-  --bg: #0a0e16;
-  --bg-soft: #121a29;
-  --card: #161f31;
-  --border: #263352;
+  --bg: #0a0d13;
+  --bg-soft: #10141e;
+  --card: #1a2231;
+  --card-raised: #212b3d;
+  --border: #2a3650;
+  --border-soft: rgba(166, 184, 219, 0.1);
   --text: #eef1f7;
   --text-dim: #8d98b0;
   --primary: #4fb3bf;
   --primary-dark: #0f6b73;
+  --primary-light: #8fd4dc;
   --primary-tint: rgba(79, 179, 191, 0.12);
   --link: #4fb3bf;
   --success: #2ecc71;
+  --success-tint: rgba(46, 204, 113, 0.14);
   --warning: #f5a623;
+  --warning-tint: rgba(245, 166, 35, 0.14);
   --danger: #ff5c5c;
-  --radius: 8px;
-  --radius-lg: 14px;
+  --danger-tint: rgba(255, 92, 92, 0.14);
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-sm: 7px;
+
+  /* --- עומק -------------------------------------------------------------------------------
+     שלוש שכבות צל (לא אחת): האחת הדוקה וכהה כדי לעגן את הרכיב לרקע, השנייה רחבה ומפוזרת
+     כדי לתת לו נפח, והשלישית קו-אור דק בשפה העליונה (כמו על פני מתכת מוברשת) שמגדיר
+     היכן האור "פוגע" ברכיב. גבול בודד ברוחב 1px לא מספיק ליצור הרגשת הרמה - שילוב הצללים
+     הוא מה שמבדיל כרטיס "מונח על המשטח" מריבוע עם קו מסביבו. */
+  --shadow-xs: 0 1px 2px rgba(1, 3, 8, 0.5);
+  --shadow-sm: 0 1px 2px rgba(1, 3, 8, 0.45), 0 4px 10px rgba(1, 3, 8, 0.35);
+  --shadow-md: 0 2px 4px rgba(1, 3, 8, 0.4), 0 10px 24px rgba(1, 3, 8, 0.45);
+  --shadow-lg: 0 8px 16px rgba(1, 3, 8, 0.35), 0 24px 48px rgba(1, 3, 8, 0.55);
+  --inset-top: inset 0 1px 0 rgba(166, 184, 219, 0.08);
 
   /* --- טיפוגרפיה ---------------------------------------------------------------------------
      זוג גופנים אחד שנבנה ככזה: IBM Plex Sans לטקסט לטיני ו-IBM Plex Sans Hebrew לעברי,
@@ -98,10 +116,11 @@ a:hover {
 }
 
 .card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--card-raised) 0%, var(--card) 100%);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
   padding: var(--sp-5);
+  box-shadow: var(--shadow-sm), var(--inset-top);
 }
 
 .auth-shell {
@@ -203,16 +222,18 @@ a:hover {
   transform: translateY(1px);
 }
 .btn-primary {
-  background: var(--primary-dark);
+  background: linear-gradient(180deg, #16808a 0%, var(--primary-dark) 100%);
   color: white;
+  box-shadow: var(--shadow-xs), var(--inset-top);
 }
 .btn-primary:hover:not(:disabled) {
-  background: #0c5861;
+  background: linear-gradient(180deg, #198f99 0%, #0c5861 100%);
 }
 .btn-secondary {
-  background: var(--bg-soft);
+  background: var(--card-raised);
   color: var(--text);
-  border-color: var(--border);
+  border-color: var(--border-soft);
+  box-shadow: var(--shadow-xs);
 }
 .btn-secondary:hover:not(:disabled) {
   border-color: var(--primary);
@@ -253,8 +274,10 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   padding: 14px 28px;
-  border-bottom: 1px solid var(--border);
   background: var(--bg-soft);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 10;
 }
 
 .navbar .brand {
@@ -297,25 +320,28 @@ a:hover {
 }
 
 .plan-pill {
+  display: inline-flex;
+  align-items: center;
   font-size: 11px;
-  padding: 2px 9px;
+  font-weight: 600;
+  padding: 3px 10px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  background: var(--bg-soft);
   color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  box-shadow: var(--shadow-xs);
 }
 .plan-pill.free {
   color: var(--text-dim);
 }
 .plan-pill.pro,
 .plan-pill.basic {
-  color: var(--primary);
-  border-color: var(--primary);
+  color: var(--primary-light);
+  background: var(--primary-tint);
 }
 .plan-pill.enterprise {
   color: var(--warning);
-  border-color: var(--warning);
+  background: var(--warning-tint);
 }
 
 .page {
@@ -358,10 +384,10 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 .site-card:hover {
-  border-color: #33456e;
+  box-shadow: var(--shadow-md), var(--inset-top);
   transform: translateY(-2px);
 }
 .site-card .site-url {
@@ -390,15 +416,26 @@ a:hover {
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   font-size: 12px;
-  padding: 2px 9px;
+  font-weight: 600;
+  padding: 3px 10px 3px 8px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text-dim);
+}
+.chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.8;
+  flex: none;
 }
 .chip.verified {
   color: var(--success);
-  border-color: var(--success);
+  background: var(--success-tint);
 }
 .chip.unverified {
   color: var(--text-dim);
@@ -436,10 +473,10 @@ a:hover {
   flex: 1;
   min-width: 120px;
   text-align: center;
-  padding: 16px 10px;
+  padding: 18px 10px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
   background: var(--bg-soft);
+  box-shadow: var(--shadow-xs), var(--inset-top);
 }
 .score-box .score-value {
   font-size: 30px;
@@ -468,45 +505,77 @@ a:hover {
 .table th,
 .table td {
   text-align: start;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-soft);
 }
 .table th {
   color: var(--text-dim);
   font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-size: 11.5px;
+  letter-spacing: 0.03em;
+  background: var(--bg-soft);
+  position: sticky;
+  top: 0;
+}
+.table th:first-child {
+  border-start-start-radius: var(--radius-sm);
+}
+.table th:last-child {
+  border-start-end-radius: var(--radius-sm);
 }
 .table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(166, 184, 219, 0.035);
 }
 
 .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
-  padding: 2px 9px;
+  font-weight: 600;
+  padding: 3px 10px 3px 8px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+}
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
 }
 .status-badge.completed {
   color: var(--success);
-  border-color: var(--success);
+  background: var(--success-tint);
 }
 .status-badge.failed {
   color: var(--danger);
-  border-color: var(--danger);
+  background: var(--danger-tint);
 }
 .status-badge.running {
   color: var(--warning);
-  border-color: var(--warning);
+  background: var(--warning-tint);
+}
+.status-badge.running::before {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .status-badge.running::before {
+    animation: none;
+  }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 .violation {
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
   padding: 12px 14px;
   margin-bottom: 10px;
   background: var(--bg-soft);
+  box-shadow: var(--shadow-xs);
 }
 .violation .v-head {
   display: flex;
@@ -566,40 +635,64 @@ a:hover {
 
 .tabs {
   display: flex;
-  gap: 6px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
+  gap: 2px;
+  background: var(--bg-soft);
+  padding: 4px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
   flex-wrap: wrap;
+  box-shadow: var(--shadow-xs);
 }
 .tab {
-  padding: 8px 14px;
-  font-size: 14px;
+  padding: 8px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
   color: var(--text-dim);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tab:hover {
+  color: var(--text);
 }
 .tab.active {
   color: var(--text);
-  border-color: var(--primary);
+  background: var(--card-raised);
+  box-shadow: var(--shadow-xs);
 }
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
 }
 .stat-card {
-  padding: 18px;
-  text-align: center;
+  padding: 20px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary);
+  opacity: 0.7;
 }
 .stat-card .stat-value {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 .stat-card .stat-label {
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: var(--fs-sm);
   margin-top: 4px;
 }
 
@@ -765,10 +858,10 @@ html[data-a11y-contrast="high"] a {
   z-index: 150;
   width: 280px;
   padding: 18px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  background: var(--card-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), var(--inset-top);
 }
 .a11y-title {
   margin: 0 0 14px;
@@ -1115,11 +1208,12 @@ body.report-mode {
 }
 
 .review-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-soft);
   border-radius: var(--radius);
-  padding: 12px;
+  padding: 14px;
   margin-bottom: 10px;
   background: var(--bg-soft);
+  box-shadow: var(--shadow-xs);
 }
 .review-head {
   display: flex;
@@ -1297,10 +1391,11 @@ body.report-mode {
 .lp-scan {
   margin-top: var(--sp-6);
   padding: var(--sp-5);
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--card-raised) 0%, var(--bg-soft) 100%);
+  border: 1px solid var(--border-soft);
   border-top: 2px solid var(--primary);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md), var(--inset-top);
 }
 
 .lp-scan-row {
@@ -1632,9 +1727,10 @@ body.report-mode {
 .ps-tile {
   padding: 18px 14px;
   text-align: center;
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--card-raised) 0%, var(--card) 100%);
+  border: 1px solid var(--border-soft);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm), var(--inset-top);
 }
 
 .ps-tile-value {
