@@ -1,22 +1,54 @@
 :root {
-  --bg: #0f1420;
-  --bg-soft: #161d2e;
-  --card: #1b2438;
-  --border: #2a3550;
-  --text: #eef1f8;
-  --text-dim: #9aa5bd;
-  /* הצבעים האלה נבחרו לפי יחסי ניגודיות שנמדדו, לא לפי העין:
-     #4f7cff כקישור על רקע הכרטיס נותן 4.17:1, ולבן על כפתור באותו צבע נותן 3.71:1 -
-     שניהם מתחת ל-4.5 שנדרש ב-WCAG AA לטקסט רגיל. הסורק שלנו תפס בדיוק את זה.
-     הכפתור הוכהה (4.82:1 מול לבן) והקישורים הובהרו (6.73:1 מול רקע הכרטיס). */
-  --primary: #3f68e8;
-  --primary-dark: #2f52c9;
-  --link: #86a9ff;
+  /* --- צבע -------------------------------------------------------------------------------
+     MAGEN הוא כלי שאומר ללקוח "האתר שלך לא בטוח" או "לא נגיש" - לכן הבסיס הכהה נשאר (כלי
+     בדיקה, לא עמוד מכירה), אבל גוון המבטא זז מכחול-SaaS גנרי לירוק-פלדה (verdigris): הצבע
+     ההיסטורי של חותמת/מגן מתכת מחומצן - קירור, רשמי, לא "עוד אפליקציה". נבדק ביחסי ניגודיות
+     בפועל: --link על רקע הכרטיס = 6.8:1, לבן על --primary-dark = 6.2:1. שניהם מעל ה-4.5
+     הנדרש ב-WCAG AA לטקסט רגיל - לא רק מעל ה-3 שמספיק לרכיבי ממשק. */
+  --bg: #0a0e16;
+  --bg-soft: #121a29;
+  --card: #161f31;
+  --border: #263352;
+  --text: #eef1f7;
+  --text-dim: #8d98b0;
+  --primary: #4fb3bf;
+  --primary-dark: #0f6b73;
+  --primary-tint: rgba(79, 179, 191, 0.12);
+  --link: #4fb3bf;
   --success: #2ecc71;
   --warning: #f5a623;
   --danger: #ff5c5c;
-  --radius: 10px;
-  font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+  --radius: 8px;
+  --radius-lg: 14px;
+
+  /* --- טיפוגרפיה ---------------------------------------------------------------------------
+     זוג גופנים אחד שנבנה ככזה: IBM Plex Sans לטקסט לטיני ו-IBM Plex Sans Hebrew לעברי,
+     מאותה משפחה ובאותם משקלים - כך שמשפט דו-לשוני לא "מתפרק" לשני טקסטים שונים באופי.
+     האופי הטכני-מדויק של Plex (לא Segoe UI הגנרי של מערכת ההפעלה) מתאים לכלי שמייצר
+     דוחות ומדדים, בלי להישמע כמו מגזין. סקאלת הגדלים לפי יחס ~1.3 בין הרמות העיקריות. */
+  font-family: "IBM Plex Sans Hebrew", "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.625rem;
+  --fs-2xl: 2rem;
+  --fs-display: clamp(1.9rem, 4.4vw, 3rem);
+  --lh-tight: 1.2;
+  --lh-base: 1.6;
+
+  /* --- מרווחים ------------------------------------------------------------------------------
+     סקאלה אחת (יחידות rem, בבסיס 8px) כדי שהמרווח בין כל שני רכיבים יהיה אחד מכמה ערכים
+     קבועים, ולא מספר שהומצא לרגע הזה. */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
 }
 
 * {
@@ -33,6 +65,17 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  font-size: var(--fs-base);
+  line-height: var(--lh-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: var(--lh-tight);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -58,7 +101,7 @@ a:hover {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: var(--sp-5);
 }
 
 .auth-shell {
@@ -76,7 +119,7 @@ a:hover {
 }
 .auth-card h1 {
   margin: 0 0 4px;
-  font-size: 26px;
+  font-size: var(--fs-2xl);
 }
 .auth-card .sub {
   color: var(--text-dim);
@@ -95,9 +138,9 @@ a:hover {
 }
 
 .info-banner {
-  background: rgba(79, 124, 255, 0.1);
-  border: 1px solid rgba(79, 124, 255, 0.35);
-  color: #9db7ff;
+  background: var(--primary-tint);
+  border: 1px solid rgba(79, 179, 191, 0.4);
+  color: #8fd4dc;
   padding: 10px 14px;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -147,21 +190,24 @@ a:hover {
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease, opacity 0.15s ease;
 }
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
 }
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
 .btn-primary {
-  background: var(--primary);
+  background: var(--primary-dark);
   color: white;
 }
 .btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
+  background: #0c5861;
 }
 .btn-secondary {
   background: var(--bg-soft);
@@ -170,6 +216,7 @@ a:hover {
 }
 .btn-secondary:hover:not(:disabled) {
   border-color: var(--primary);
+  color: var(--primary);
 }
 .btn-danger {
   background: transparent;
@@ -218,7 +265,7 @@ a:hover {
   gap: 8px;
 }
 .navbar .brand .badge {
-  background: var(--primary);
+  background: var(--primary-dark);
   color: white;
   font-size: 11px;
   padding: 2px 8px;
@@ -289,12 +336,14 @@ a:hover {
 }
 .page-header h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: var(--fs-xl);
 }
 .page-header .sub {
   color: var(--text-dim);
-  font-size: 14px;
+  font-size: var(--fs-sm);
   margin-top: 4px;
+  max-width: 60ch;
+  line-height: var(--lh-base);
 }
 
 .grid {
@@ -309,6 +358,11 @@ a:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.site-card:hover {
+  border-color: #33456e;
+  transform: translateY(-2px);
 }
 .site-card .site-url {
   font-weight: 600;
@@ -352,8 +406,9 @@ a:hover {
 
 .empty-state {
   text-align: center;
-  padding: 48px 20px;
+  padding: var(--sp-7) var(--sp-5);
   color: var(--text-dim);
+  border-style: dashed;
 }
 
 .spinner {
@@ -361,7 +416,7 @@ a:hover {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.25);
-  border-top-color: currentColor;
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -492,8 +547,8 @@ a:hover {
   margin-top: 8px;
   padding: 10px 12px;
   border-radius: 6px;
-  background: rgba(79, 124, 255, 0.08);
-  border: 1px solid rgba(79, 124, 255, 0.25);
+  background: var(--primary-tint);
+  border: 1px solid rgba(79, 179, 191, 0.3);
   font-size: 13px;
 }
 .guided-fix .gf-title {
@@ -592,7 +647,7 @@ a:hover {
   top: -60px;
   z-index: 200;
   padding: 10px 18px;
-  background: var(--primary);
+  background: var(--primary-dark);
   color: #fff;
   border-radius: var(--radius);
   font-weight: 600;
@@ -691,7 +746,7 @@ html[data-a11y-contrast="high"] a {
   height: 56px;
   border-radius: 50%;
   border: 2px solid #ffffff;
-  background: #1552d8;
+  background: var(--primary-dark);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -700,7 +755,7 @@ html[data-a11y-contrast="high"] a {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 .a11y-fab:hover {
-  background: #0f3fa8;
+  background: #0c5861;
 }
 
 .a11y-panel {
@@ -745,7 +800,7 @@ html[data-a11y-contrast="high"] a {
   cursor: pointer;
 }
 .a11y-btn:hover {
-  background: var(--primary);
+  background: var(--primary-dark);
   color: #fff;
 }
 .a11y-value {
@@ -957,8 +1012,8 @@ body.report-mode {
 .rep-info { color: #4a5468; }
 
 .rep-fix {
-  background: #f2f5fa;
-  border-inline-end: 3px solid #3f68e8;
+  background: #f1f7f8;
+  border-inline-end: 3px solid #0f6b73;
   padding: 8px 10px;
   margin-top: 8px;
   font-size: 14px;
@@ -967,7 +1022,7 @@ body.report-mode {
   display: block;
   font-weight: 700;
   font-size: 12px;
-  color: #2f52c9;
+  color: #0f6b73;
 }
 
 .rep-table {
@@ -1212,16 +1267,18 @@ body.report-mode {
 }
 
 .lp-eyebrow {
-  margin: 0 0 10px;
-  color: var(--text-dim);
-  font-size: 14px;
-  letter-spacing: 0.04em;
+  margin: 0 0 var(--sp-3);
+  color: var(--primary);
+  font-size: var(--fs-sm);
+  font-weight: 600;
 }
 
 .lp-title {
   margin: 0;
-  font-size: clamp(26px, 5vw, 42px);
-  line-height: 1.25;
+  font-size: var(--fs-display);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 .lp-title-dim {
@@ -1230,18 +1287,19 @@ body.report-mode {
 }
 
 .lp-lead {
-  margin: 16px 0 0;
-  max-width: 62ch;
+  margin: var(--sp-4) 0 0;
+  max-width: 58ch;
   color: var(--text-dim);
-  font-size: 17px;
+  font-size: var(--fs-md);
   line-height: 1.7;
 }
 
 .lp-scan {
-  margin-top: 28px;
-  padding: 20px;
+  margin-top: var(--sp-6);
+  padding: var(--sp-5);
   background: var(--bg-soft);
   border: 1px solid var(--border);
+  border-top: 2px solid var(--primary);
   border-radius: var(--radius);
 }
 
