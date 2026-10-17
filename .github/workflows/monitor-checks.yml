@@ -4,9 +4,9 @@
 # ולבדיקת הזמינות (HTTP+TLS קלה) יש קצב הגיוני שונה בתכלית - צימוד שלהן לאותו cron היה
 # מחייב להריץ את היקרה בכל 15 דקות, או את הקלה רק פעם ביום.
 #
-# נדרשים אותם Repository secrets כמו ב-scheduled-scans.yml, בשינוי נתיב:
-#   MAGEN_API_BASE_URL  - https://<הדומיין> (בלי /api/... בסוף)
-#   MAGEN_CRON_SECRET    - אותו ערך שמוגדר כ-CRON_SECRET ב-Vercel
+# לא נדרש secret חדש: הנתיב הבסיסי נגזר מ-MAGEN_CRON_URL הקיים (שכבר מוגדר ב-repo
+# ומשמש את scheduled-scans.yml), על ידי הסרת הסיומת /api/cron/scheduled-scans ממנו.
+# נדרש רק MAGEN_CRON_SECRET, שכבר קיים.
 
 name: monitor checks
 
@@ -25,7 +25,7 @@ jobs:
       - name: בדיקת סודות
         run: |
           missing=""
-          [ -z "${{ secrets.MAGEN_API_BASE_URL }}" ] && missing="$missing MAGEN_API_BASE_URL"
+          [ -z "${{ secrets.MAGEN_CRON_URL }}" ] && missing="$missing MAGEN_CRON_URL"
           [ -z "${{ secrets.MAGEN_CRON_SECRET }}" ] && missing="$missing MAGEN_CRON_SECRET"
           if [ -n "$missing" ]; then
             echo "::error::חסרים Repository secrets:$missing - הוסיפו אותם ב-Settings > Secrets and variables > Actions"
@@ -34,9 +34,15 @@ jobs:
 
       - name: הפעלת בדיקות הזמינות
         run: |
+          # גוזרים את הכתובת הבסיסית מ-MAGEN_CRON_URL הקיים (.../api/cron/scheduled-scans)
+          base_url="${MAGEN_CRON_URL%/api/cron/scheduled-scans}"
+          if [ "$base_url" = "$MAGEN_CRON_URL" ]; then
+            echo "::error::MAGEN_CRON_URL לא בפורמט הצפוי (.../api/cron/scheduled-scans) - אי אפשר לגזור ממנו את הכתובת הבסיסית"
+            exit 1
+          fi
           body=$(mktemp)
           code=$(curl -sS -o "$body" -w '%{http_code}' \
-            -X POST "${{ secrets.MAGEN_API_BASE_URL }}/api/cron/monitor-checks" \
+            -X POST "$base_url/api/cron/monitor-checks" \
             -H "x-cron-secret: ${{ secrets.MAGEN_CRON_SECRET }}" \
             -H 'content-type: application/json' \
             --max-time 60)
@@ -47,3 +53,5 @@ jobs:
             echo "::error::הנתיב החזיר $code - ראו את גוף התשובה למעלה"
             exit 1
           fi
+        env:
+          MAGEN_CRON_URL: ${{ secrets.MAGEN_CRON_URL }}
