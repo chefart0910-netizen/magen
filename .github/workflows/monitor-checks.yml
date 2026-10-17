@@ -1,0 +1,49 @@
+# MAGEN - בדיקת זמינות + תוקף SSL, הרבה יותר תדירה מהסריקה המלאה (scheduled-scans.yml).
+# ==========================================================================================
+# workflow נפרד, לא תדירות נוספת באותו קובץ: לסריקה המלאה (lighthouse/axe, יקרה ואיטית)
+# ולבדיקת הזמינות (HTTP+TLS קלה) יש קצב הגיוני שונה בתכלית - צימוד שלהן לאותו cron היה
+# מחייב להריץ את היקרה בכל 15 דקות, או את הקלה רק פעם ביום.
+#
+# נדרשים אותם Repository secrets כמו ב-scheduled-scans.yml, בשינוי נתיב:
+#   MAGEN_API_BASE_URL  - https://<הדומיין> (בלי /api/... בסוף)
+#   MAGEN_CRON_SECRET    - אותו ערך שמוגדר כ-CRON_SECRET ב-Vercel
+
+name: monitor checks
+
+on:
+  schedule:
+    # כל 15 דקות - קצב סביר לזימוי זמינות בלי להציף; תוקף SSL משתנה לאט בהרבה אבל
+    # הבדיקה נגזרת מאותו HTTP request כך שאין עלות נוספת בלבדוק אותו בכל ריצה.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: בדיקת סודות
+        run: |
+          missing=""
+          [ -z "${{ secrets.MAGEN_API_BASE_URL }}" ] && missing="$missing MAGEN_API_BASE_URL"
+          [ -z "${{ secrets.MAGEN_CRON_SECRET }}" ] && missing="$missing MAGEN_CRON_SECRET"
+          if [ -n "$missing" ]; then
+            echo "::error::חסרים Repository secrets:$missing - הוסיפו אותם ב-Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+
+      - name: הפעלת בדיקות הזמינות
+        run: |
+          body=$(mktemp)
+          code=$(curl -sS -o "$body" -w '%{http_code}' \
+            -X POST "${{ secrets.MAGEN_API_BASE_URL }}/api/cron/monitor-checks" \
+            -H "x-cron-secret: ${{ secrets.MAGEN_CRON_SECRET }}" \
+            -H 'content-type: application/json' \
+            --max-time 60)
+          echo "HTTP $code"
+          cat "$body"
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::הנתיב החזיר $code - ראו את גוף התשובה למעלה"
+            exit 1
+          fi

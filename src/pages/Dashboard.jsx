@@ -4,6 +4,7 @@ import { api } from "../lib/api";
 import { useAuth } from "../lib/AuthContext";
 import { useLang } from "../lib/LangContext";
 import { formatDate } from "../lib/format";
+import SiteSearch from "../components/SiteSearch";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -107,9 +108,12 @@ export default function Dashboard() {
               : "מעקב אחרי ביצועים, נגישות, אבטחה ועומס לכל האתרים שלך."}
           </div>
         </div>
-        <button ref={addButtonRef} className="btn btn-primary" onClick={() => setShowAdd(true)}>
-          + הוספת אתר
-        </button>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <SiteSearch />
+          <button ref={addButtonRef} className="btn btn-primary" onClick={() => setShowAdd(true)}>
+            + הוספת אתר
+          </button>
+        </div>
       </div>
 
       {pendingExpert && (

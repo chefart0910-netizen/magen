@@ -113,6 +113,13 @@ export const api = {
   adminSites: () => request("/admin/sites"),
   adminScans: () => request("/admin/scans"),
   adminAuditLog: () => request("/admin/audit-log"),
+
+  // חיפוש אישי - אתרים וממצאי סריקה של המשתמש המחובר (lib/routes/search.js).
+  search: (q) => request(`/search?q=${encodeURIComponent(q)}`),
+
+  // הגדרות התראות מעקב (webhook + הפעלה/כיבוי - lib/routes/account.js).
+  getAlertSettings: () => request("/account/alerts"),
+  saveAlertSettings: (payload) => request("/account/alerts", { method: "PATCH", body: payload }),
 };
 
 export { getToken };
